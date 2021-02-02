@@ -1,7 +1,6 @@
 [tool.poetry]
 name = "benchmark_utils"
 version = "0.0.1"
-description = ""
 authors = ["ayasyrev <a.yasyrev@gmail.com>"]
 description = "Benchmark utils"
 license = "Apache 2.0"
@@ -13,6 +12,7 @@ keywords = ["Benchmark"]
 
 [tool.poetry.dependencies]
 python = "^3.7"
+tqdm = "^4.56.0"
 
 [tool.poetry.dev-dependencies]
 
