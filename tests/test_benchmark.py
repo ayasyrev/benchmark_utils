@@ -25,3 +25,4 @@ def test_benchmark():
     bench.run('')
     bench = benchmark.Benchmark(func_to_test)
     assert repr(bench) == 'func_to_test'
+    benchmark.benchmark(func_to_test)
