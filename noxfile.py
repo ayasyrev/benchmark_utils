@@ -29,3 +29,11 @@ def lint(session):
 #     args = session.posargs or locations
 #     install_with_constraints(session, "mypy")
 #     session.run("mypy", *args)
+
+@nox.session(python="3.8")
+def coverage(session: Session) -> None:
+    """Upload coverage data."""
+    session.install("coverage", "coverage[toml]", "codecov")
+    # install_with_constraints(session, "coverage[toml]", "codecov")
+    session.run("coverage", "xml", "--fail-under=0")
+    session.run("codecov", *session.posargs)
