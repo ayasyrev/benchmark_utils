@@ -108,3 +108,6 @@ venv.bak/
 
 .idea/
 .vscode/settings.json
+
+# nox
+.nox

@@ -1,5 +1,5 @@
 from timeit import timeit
-from typing import Union, Dict, List, Callable
+from typing import Iterator, Union, Dict, List, Callable
 from tqdm.autonotebook import tqdm
 
 
@@ -77,3 +77,48 @@ class Benchmark:
 
     def __repr__(self) -> str:
         return ', '.join(self.bench_func_dict.keys())
+
+
+class BenchmarkIterator(Benchmark):
+    """Benchmark Iterator.
+
+    Args:
+        iterator_dict (Dict[str, Iterator]): Iterators to benchmark as Dict: {name: Iterator}
+    """
+    def __init__(self, iterator_dict: Dict[str, Iterator], num_repeats: int = 5):
+        self.iter_dict = iterator_dict
+        benchmark_dict = {iter_name: self.iterate_func(self.iter_dict[iter_name]) for iter_name in self.iter_dict}
+        super().__init__(func=benchmark_dict, num_repeats=num_repeats)
+
+    def iterate_func(self, iter_name: str) -> Callable:
+        """Iterate self.iter
+        """
+        def inner(self, iter_name):
+            iter = self.iter_dict[iter_name]
+            with tqdm(total=len(iter), leave=False) as pbar:
+                for item in iter:
+                    pbar.update(1)
+        return inner
+
+    # def _run_benchmark(self, func_name: str, num_repeats: int):
+    #     return self._benchmark(self.run_func_iter(func_name), num_repeats, func_name)
+
+    # def run_func_iter(self, func_name: str) -> Callable:
+    #     """Return func, that run func over item_list"""
+    #     def inner(self=self, func_name=func_name):
+    #         func = self.bench_func_dict[func_name]
+    #         # with tqdm.tqdm_notebook(total=len(self.item_list), leave=False) as pbar:
+    #         with tqdm(total=len(self.item_list), leave=False) as pbar:
+    #             for item in self.item_list:
+    #                 try:
+    #                     func(item)
+    #                 except Exception as expt:
+    #                     if self.exeptions is None:
+    #                         self.exeptions = {}
+    #                     exception_info = {'exeption': expt, 'item': item}
+    #                     if func_name in self.exeptions.keys():
+    #                         self.exeptions[func_name].append(exception_info)
+    #                     else:
+    #                         self.exeptions[func_name] = [exception_info]
+    #                 pbar.update(1)
+    #     return inner
