@@ -6,7 +6,7 @@ from shutil import rmtree
 from setuptools import Command, find_packages, setup
 
 # Package meta-data.
-NAME = "Benchmark_utils"
+NAME = "benchmark_utils"
 DESCRIPTION = "Utils for benchmark."
 URL = "https://github.com/ayasyrev/benchmark_utils"
 EMAIL = "a.yasyrev@gmail.com"
@@ -98,7 +98,7 @@ setup(
     install_requires=REQUIRED,
     extras_require=EXTRAS,
     classifiers=[
-        "License :: OSI Approved :: MIT License",
+        "License :: OSI Approved :: Apache 2.0 License",
         "Intended Audience :: Developers",
         "Intended Audience :: Science/Research",
         "Operating System :: OS Independent",
