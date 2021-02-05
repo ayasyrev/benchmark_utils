@@ -2,7 +2,7 @@ from benchmark_utils import benchmark
 from time import sleep
 
 
-def func_to_test(sleep_time=0.1):
+def func_to_test(sleep_time: float = 0.1) -> None:
     sleep(sleep_time)
 
 
@@ -61,3 +61,20 @@ def test_benchmark_iter():
     result = bench.results[name_func]
     print(result)
     assert equal_near(result, sleep_time * len_item_list)
+
+
+def func_with_exception(input: bool) -> None:
+    if input:
+        pass
+    else:
+        raise Exception('error')
+
+
+def test_benchmark_iter_wrong_item():
+    item_list = [True, False]
+    bench = benchmark.BenchmarkIter(func=func_with_exception, item_list=item_list)
+    assert bench.exeptions is None
+    assert bench.__repr__() == 'func_with_exception'
+    assert repr(bench) == 'func_with_exception'
+    bench()
+    assert bench.exeptions is not None
