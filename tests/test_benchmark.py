@@ -2,11 +2,11 @@ from benchmark_utils import benchmark
 from time import sleep
 
 
-def func_to_test(sleep_time=0.01):
+def func_to_test(sleep_time=0.1):
     sleep(sleep_time)
 
 
-def equal_near(item_1: float, item_2: float, thresold: float = 0.01) -> bool:
+def equal_near(item_1: float, item_2: float, thresold: float = 0.1) -> bool:
     """Is two item close to equl?
     Return True is difference less than thresold.
 
@@ -18,13 +18,13 @@ def equal_near(item_1: float, item_2: float, thresold: float = 0.01) -> bool:
     Returns:
         bool: Return True if difference less than thresold.
     """
-    return abs(item_1 - item_2) < abs(thresold * item_2)
+    return abs(1 - (item_1 / item_2)) < thresold
 
 
 def test_equal_near():
     assert equal_near(1., 1.0099)
     assert equal_near(1., 0.999)
-    assert not equal_near(1., 1.011)
+    assert not equal_near(1., 1.112)
     assert not equal_near(1., 0.9)
 
 
@@ -38,9 +38,7 @@ def test_benchmark():
     assert repr(bench) == name_func
     bench()
     result = bench.results[name_func]
-    assert equal_near(result, sleep_time, 0.05)
-    # assert result < (sleep_time * 1.05)
-    # assert result > (sleep_time / 1.05)
+    assert equal_near(result, sleep_time)
     assert str(bench) == name_func
     bench(1)
     bench.run()
@@ -62,4 +60,4 @@ def test_benchmark_iter():
     bench()
     result = bench.results[name_func]
     print(result)
-    assert equal_near(result, sleep_time * len_item_list, thresold=0.05)
+    assert equal_near(result, sleep_time * len_item_list)
