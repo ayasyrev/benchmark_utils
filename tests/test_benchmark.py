@@ -38,7 +38,7 @@ def test_benchmark():
     assert repr(bench) == name_func
     bench()
     result = bench.results[name_func]
-    assert equal_near(result, sleep_time)
+    assert equal_near(result, sleep_time, thresold=0.5)
     assert str(bench) == name_func
     bench(1)
     bench.run()
@@ -60,7 +60,7 @@ def test_benchmark_iter():
     bench()
     result = bench.results[name_func]
     print(result)
-    assert equal_near(result, sleep_time * len_item_list)
+    assert equal_near(result, sleep_time * len_item_list, thresold=0.5)
 
 
 def func_with_exception(input: bool) -> None:

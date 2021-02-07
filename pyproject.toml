@@ -1,0 +1,9 @@
+[tool.coverage.paths]
+source = ["benchmark_utils", "*/site-packages"]
+
+[tool.coverage.run]
+branch = true
+source = ["benchmark_utils"]
+
+[tool.coverage.report]
+show_missing = true
