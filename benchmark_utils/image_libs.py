@@ -1,6 +1,9 @@
 import importlib
+from dataclasses import dataclass
 from abc import ABC
-from typing import Union, List
+# from typing import List
+
+from benchmark_utils.read_image import image_read_dict
 
 # from importlib.metadata import version
 # import sys
@@ -21,50 +24,63 @@ libraries = ["torchvision", "PIL",                   "cv2",           "jpeg4py",
 image_lib_available = [library for library in libraries if importlib.util.find_spec(library) is not None]
 
 
+@dataclass
+class ImageLibCfg:
+    lib_name: str
+    package: str
+    # import_name: str
+    installation_type: str = 'pip'
+
+
+image_libs_supported = {"torchvision": ImageLibCfg('torchvision', 'torchvision'),
+                        # "pillow-simd": ImageLibCfg('PIL-simd', 'pillow-simd', 'PIL'),
+                        "PIL": ImageLibCfg('PIL', 'pillow'),
+                        # "opencv": ImageLibCfg('opencv', 'opencv-python', 'cv2'),
+                        # "opencv-headless": ImageLibCfg('opencv-headless', 'opencv-python-headless', 'cv2'),
+                        "cv2": ImageLibCfg('cv2', 'opencv-python-headless'),
+                        "jpeg4py": ImageLibCfg('jpeg4py', 'jpeg4py'),
+                        "accimage": ImageLibCfg('accimage', 'accimage', installation_type='conda'),
+                        "pyvips": ImageLibCfg('pyvips', 'pyvips'),
+                        "skimage": ImageLibCfg('skimage', 'skimage'),
+                        "imageio": ImageLibCfg('imageio', 'imageio')}
+
+
 class ImageLib(ABC):
-    __version__: str = ''
-    installation_type: str = ''
-    package: Union[str, List[str]] = ''
+    def __init__(self, image_lib: ImageLibCfg, read_func: callable = None, version: str = '') -> None:
+        super().__init__()
+        self.lib_name = image_lib.lib_name
+        self.installation_type: str = image_lib.installation_type
+        self.package: str = image_lib.package
+        if read_func is None:
+            self._read_func = image_read_dict[self.lib_name]['read_func']
+            self.__version__ = image_read_dict[self.lib_name]['version']
+        else:
+            self._read_func: callable = read_func
+            self.__version__ = version
 
     def __str__(self):
-        return self.__class__.__name__
+        return self.lib_name
 
     def __repr__(self):
-        return f"{self.__class__.__name__}: pkg: {self.package}, ver: {self.__version__}"
+        return f"{self.lib_name}: pkg: {self.package}, ver: {self.__version__}"
 
     def read(self, file_name: str) -> object:
-        raise NotImplementedError
+        return self._read_func(file_name)
 
 
-class ImageLibPIL(ImageLib):
-    def __init__(self) -> None:
-        super().__init__()
-        if 'PIL' in image_lib_available:
-            from PIL import __version__, Image
-            self.__version__ = __version__
-            self.image_open = Image.open
-        else:
-            self.__version__ = ''
-
-        self.installation_type = 'pip'
-        self.package = 'pillow'
-
-    def read(self, file_name: str) -> object:
-        with open(file_name, 'rb') as file:
-            img = self.image_open(file)
-            return img.convert('RGB')
-
-
-image_libs_dict = {'PIL': ImageLibPIL}
+# if 'PIL' in image_lib_available:
+#     image_libs_dict['PIL'] = ImageLib(image_libs_supported['pillow'])
 
 
 class ImageLibs:
     def __init__(self) -> None:
-        self.supported = ["torchvision", "PIL", "cv2", "jpeg4py", "accimage", "pyvips", "skimage", "imageio"]
-        self.available = [library for library in self.supported if importlib.util.find_spec(library) is not None]
-        # self.lib_versions = {lib_name: version(lib_name) for lib_name in self.available}
-        self._libs = {lib_name: image_libs_dict[lib_name]() for lib_name in self.available
-                      if lib_name in image_libs_dict}
+        self.supported = [lib_name for lib_name in image_libs_supported]
+        self.available = [lib_name for lib_name in self.supported
+                          if importlib.util.find_spec(lib_name) is not None]
+        # self._libs = {lib_name: image_libs_dict[lib_name] for lib_name in self.available
+        #               if lib_name in image_libs_dict}
+        self._libs = {lib_name: ImageLib(image_libs_supported[lib_name]) for lib_name in self.available
+                      if lib_name in image_read_dict}
 
     def __getitem__(self, lib_name):
         return self._libs[lib_name]
