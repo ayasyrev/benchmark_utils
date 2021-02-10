@@ -2,6 +2,7 @@
 
 from benchmark_utils.image_libs import (ImageLib, ImageLibs, ImageLibCfg,
                                         image_lib_available)
+from benchmark_utils.read_image import read_PIL
 
 
 def test_image_lib():
@@ -28,3 +29,10 @@ def test_image_libs(img_lib):
     img_lib_obj = image_libs[img_lib]
     img_lib_obj.read('tests/test_imgs/test_img_1.JPEG')
     image_libs[img_lib].read('tests/test_imgs/test_img_2.JPEG')
+
+
+def test_read_image():
+    if read_PIL is None:
+        pass
+    else:
+        read_PIL('tests/test_imgs/test_img_1.JPEG')
