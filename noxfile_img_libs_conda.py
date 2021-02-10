@@ -1,6 +1,6 @@
 import nox
 
-from benchmark_utils.image_libs_supported import image_libs_supported
+from benchmark_utils.image_libs import image_libs_supported
 
 conda_img_packages = [lib_name for lib_name in image_libs_supported
                       if image_libs_supported[lib_name].installation_type == 'conda']

@@ -1,8 +1,8 @@
 import importlib
 from abc import ABC
 
-from benchmark_utils.read_image import image_read_dict
-from benchmark_utils.image_libs_supported import image_libs_supported, ImageLibCfg
+from benchmark_utils.image_libs import image_libs_supported, ImageLibCfg
+from benchmark_utils.image_libs.read_image import image_read_dict
 
 image_lib_available = [lib_name for lib_name in image_libs_supported if importlib.util.find_spec(lib_name) is not None]
 
