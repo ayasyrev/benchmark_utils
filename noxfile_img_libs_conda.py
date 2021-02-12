@@ -7,7 +7,7 @@ import nox
 conda_img_packages = ['accimage', 'pyvips']
 
 
-@nox.session(python=["3.8", "3.7", "3.9"], venv_backend='conda')
+@nox.session(python=["3.8", "3.9"], venv_backend='conda')
 @nox.parametrize('img_lib', conda_img_packages)
 def tests_conda(session, img_lib):
     args = session.posargs or ["--cov"]

@@ -14,7 +14,7 @@ lib_to_package = {
     'pyvips': 'pyvips'}
 
 
-@nox.session(python=["3.8", "3.7", "3.9"])
+@nox.session(python=["3.8", "3.9"])
 @nox.parametrize('img_lib', pip_img_packages)
 def tests(session, img_lib):
     args = session.posargs or ["--cov"]
