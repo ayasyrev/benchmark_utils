@@ -1,7 +1,6 @@
 # import pytest
 
-from benchmark_utils.image_libs.image_libs import (ImageLib, ImageLibs, ImageLibCfg,
-                                        image_lib_available)
+from benchmark_utils.image_libs.image_libs import ImageLib, ImageLibs, ImageLibCfg, image_lib_available
 
 
 def test_image_lib():
