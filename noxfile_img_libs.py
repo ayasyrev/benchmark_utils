@@ -1,14 +1,23 @@
 import nox
 
-from benchmark_utils.image_libs import image_libs_supported
-pip_img_packages = [lib_name for lib_name in image_libs_supported
-                    if image_libs_supported[lib_name].installation_type == 'pip']
+# from benchmark_utils.image_libs import image_libs_supported
+# pip_img_packages = [lib_name for lib_name in image_libs_supported
+#                     if image_libs_supported[lib_name].installation_type == 'pip']
+pip_img_packages = ['torchvision', 'PIL', 'cv2', 'jpeg4py', 'skimage', 'imageio', 'pyvips']
+lib_to_package = {
+    'torchvision': 'torchvision',
+    'PIL': 'pillow',
+    'cv2': 'opencv-python-headless',
+    'jpeg4py': 'jpeg4py',
+    'skimage': 'scikit-image',
+    'imageio': 'imageio',
+    'pyvips': 'pyvips'}
 
 
-@nox.session(python=["3.8"])
+@nox.session(python=["3.8", "3.7", "3.9"])
 @nox.parametrize('img_lib', pip_img_packages)
 def tests(session, img_lib):
     args = session.posargs or ["--cov"]
     session.install(".", "pytest", "pytest-cov", "coverage[toml]")
-    session.install(image_libs_supported[img_lib].package)
+    session.install(lib_to_package[img_lib])
     session.run("pytest", '--img_lib', img_lib, *args)
