@@ -30,6 +30,7 @@ class BenchmarkImageRead(BenchmarkIter):
             bench_func_dict = {image_lib: image_libs[image_lib]._read_func for image_lib in image_libs.available}
         else:
             bench_func_dict = func
+            image_libs = None
         # bench_func_dict = {}
         # for image_lib in image_libs.available:
         #     function = func.get(image_lib)

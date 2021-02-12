@@ -1,5 +1,3 @@
-# tep ignore test imgs
-tests/test_imgs/*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

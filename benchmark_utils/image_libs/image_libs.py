@@ -35,8 +35,6 @@ class ImageLibs:
         self.supported = [lib_name for lib_name in image_libs_supported]
         self.available = [lib_name for lib_name in self.supported
                           if importlib.util.find_spec(lib_name) is not None]
-        # self._libs = {lib_name: image_libs_dict[lib_name] for lib_name in self.available
-        #               if lib_name in image_libs_dict}
         self._libs = {lib_name: ImageLib(image_libs_supported[lib_name]) for lib_name in self.available
                       if lib_name in image_read_dict}
 
