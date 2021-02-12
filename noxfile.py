@@ -1,17 +1,19 @@
 import nox
 
 
-@nox.session(python=["3.8", "3.7", "3.9"])
+@nox.session(python=["3.8", "3.9"])
 def tests(session):
-    session.install(".", "pytest")
-    session.run("pytest", external=True)
+    args = session.posargs or ["--cov"]
+    session.install(".", "pytest", "pytest-cov", "coverage[toml]")
+    # session.run("pytest", external=True)
+    session.run("pytest", *args)
 
 
-locations = "tests", "noxfile.py"
+locations = "benchmark_utils", "tests", "noxfile.py"
 
 
 @nox.session(python=["3.8", "3.7", "3.9"])
 def lint(session):
     args = session.posargs or locations
-    session.install("flake8")
+    session.install("flake8", "flake8-import-order")
     session.run("flake8", *args)

@@ -84,6 +84,7 @@ class BenchmarkIter(Benchmark):
     def __init__(self, func: Union[callable, Dict[str, callable]], item_list: List = [], num_repeats: int = 5):
         super().__init__(func, num_repeats=num_repeats)
         self.item_list = item_list
+        self.exeptions = None
 
     def _run_benchmark(self, func_name: str, num_repeats: int):
         return self._benchmark(self.run_func_iter(func_name), num_repeats, func_name)
