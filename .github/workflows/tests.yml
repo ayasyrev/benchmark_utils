@@ -11,9 +11,9 @@ jobs:
     - uses: actions/checkout@v2
     - uses: actions/setup-python@v1
       with:
-        python-version: ${{ matrix.python-version }
+        python-version: ${{ matrix.python-version }}
         architecture: x64
     - run: pip install nox
     # - run: pip install poetry
-    - run: nox -p ${{ matrix.python-version }
-    - run: nox -f noxfile_img_libs.py -p ${{ matrix.python-version }
+    - run: nox -p ${{ matrix.python-version }}
+    - run: nox -f noxfile_img_libs.py -p ${{ matrix.python-version }}
