@@ -1,14 +1,15 @@
 # pyright: reportMissingImports=false
 # pyright: reportMissingModuleSource=false
 import importlib
-# import numpy as np
-from importlib.metadata import version
 
+# import numpy as np
+# from importlib.metadata import version
+import pkg_resources
 
 PIL_AVAILABLE = importlib.util.find_spec("PIL") is not None
 
 if PIL_AVAILABLE:
-    from PIL import __version__, Image
+    from PIL import Image, __version__
     PIL_version = __version__
     # self.image_open = Image.open
 
@@ -48,8 +49,8 @@ else:
 
 PYVIPS_AVAILABLE = importlib.util.find_spec("pyvips") is not None
 if PYVIPS_AVAILABLE:
-    import pyvips
     import numpy as np
+    import pyvips
 
     def read_pyvips(image_path: str) -> np.array:
         image = pyvips.Image.new_from_file(image_path, access="sequential")
@@ -82,7 +83,7 @@ if JPEG4PY_AVAILABLE:
 
     def read_jpeg4py(image_path: str) -> object:
         return jpeg4py.JPEG(image_path).decode()
-    jpeg4py_version = version('jpeg4py')
+    jpeg4py_version = pkg_resources.get_distribution('jpeg4py').version
 else:
     read_jpeg4py = None
     jpeg4py_version = None
@@ -112,7 +113,8 @@ if ACCIMAGE_AVAILABLE:
 
     def read_accimage(image_path: str) -> accimage.Image:
         return accimage.Image(image_path)
-    accimage_version = version('accimage')
+    # accimage_version = version('accimage')
+    accimage_version = pkg_resources.get_distribution('accimage').version
 else:
     read_accimage = None
     accimage_version = None
