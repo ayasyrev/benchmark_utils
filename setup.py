@@ -11,8 +11,7 @@ DESCRIPTION = "Utils for benchmark."
 URL = "https://github.com/ayasyrev/benchmark_utils"
 EMAIL = "a.yasyrev@gmail.com"
 AUTHOR = "Andrei Yasyrev"
-REQUIRES_PYTHON = ">=3.6.0"
-# VERSION = "0.0.1"
+REQUIRES_PYTHON = ">=3.7.0"
 
 here = os.path.abspath(os.path.dirname(__file__))
 
@@ -108,5 +107,4 @@ setup(
         "Topic :: Software Development :: Libraries :: Python Modules",
     ],
     cmdclass={"upload": UploadCommand},
-    entry_points={"console_scripts": ["benchmark_utils=benchmark_utils.console:app"]},
 )
