@@ -11,7 +11,7 @@ def equal_near(item_1: float, item_2: float, thresold: float = 0.1) -> bool:
     Return True is difference less than thresold.
 
     Args:
-        iem_1 (float): First item.
+        item_1 (float): First item.
         item_2 (float): Second item.
         thresold (float, optional): Thresold for compare. Defaults to 0.01.
 

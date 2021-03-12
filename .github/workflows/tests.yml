@@ -14,6 +14,4 @@ jobs:
         python-version: ${{ matrix.python }}
         architecture: x64
     - run: pip install nox
-    # - run: pip install poetry
     - run: nox -p ${{ matrix.python }}
-    - run: nox -f noxfile_img_libs.py -p ${{ matrix.python }}
