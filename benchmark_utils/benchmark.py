@@ -67,10 +67,19 @@ class Benchmark:
                 result[res] = sum(self._results[res]) / len(self._results[res])
             return result
 
-    def print_results(self) -> None:
-        print(self.results_header)
-        for img_lib in self.results:
-            print(f"{img_lib:12}: {self.results[img_lib]:6.2f}")
+    def print_results(self, results=None, results_header=None, sort=False, reverse=False) -> None:
+        self._print_results(results=results, results_header=None, sort=sort, reverse=reverse)
+
+    def _print_results(self, results=None, results_header=None, sort=False, reverse=False) -> None:
+        if results_header is None:
+            results_header = self.results_header
+        if results is None:
+            results = self.results
+        print(results_header)
+        if sort:
+            results = {func_name: results[func_name] for func_name in sorted(results, key=results.get, reverse=reverse)}
+        for func_name in results:
+            print(f"{func_name:12}: {results[func_name]:6.2f}")
 
     def __str__(self) -> str:
         return ', '.join(self.bench_func_dict.keys())
@@ -107,3 +116,10 @@ class BenchmarkIter(Benchmark):
                             self.exeptions[func_name] = [exception_info]
                     pbar.update(1)
         return inner
+
+    def print_results_per_item(self, sort=False, reverse=True) -> None:
+        num_items = len(self.item_list)
+        results = self.results
+        results = {func_name: (1 / results[func_name] * num_items) for func_name in results}
+        results_header = ' Func name  | Items/sec'
+        self._print_results(results=results, results_header=results_header, sort=sort, reverse=reverse)

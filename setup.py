@@ -97,7 +97,7 @@ setup(
     install_requires=REQUIRED,
     extras_require=EXTRAS,
     classifiers=[
-        "License :: OSI Approved :: Apache 2.0 License",
+        "License :: OSI Approved :: Apache Software License",
         "Intended Audience :: Developers",
         "Intended Audience :: Science/Research",
         "Operating System :: OS Independent",
