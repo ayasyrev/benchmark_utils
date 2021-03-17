@@ -67,10 +67,13 @@ class Benchmark:
                 result[res] = sum(self._results[res]) / len(self._results[res])
             return result
 
-    def print_results(self) -> None:
+    def print_results(self, sort=False, reverse=False) -> None:
         print(self.results_header)
-        for img_lib in self.results:
-            print(f"{img_lib:12}: {self.results[img_lib]:6.2f}")
+        results = self.results
+        if sort:
+            results = {func_name: results[func_name] for func_name in sorted(results, key=results.get, reverse=reverse)}
+        for func_name in results:
+            print(f"{func_name:12}: {results[func_name]:6.2f}")
 
     def __str__(self) -> str:
         return ', '.join(self.bench_func_dict.keys())

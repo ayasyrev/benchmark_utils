@@ -47,6 +47,8 @@ def test_benchmark():
     bench = benchmark.Benchmark(func_to_test)
     assert repr(bench) == 'func_to_test'
     benchmark.benchmark(func_to_test)
+    bench.print_results()
+    bench.print_results(sort=True)
 
 
 def test_benchmark_iter():
