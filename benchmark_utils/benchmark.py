@@ -67,19 +67,25 @@ class Benchmark:
                 result[res] = sum(self._results[res]) / len(self._results[res])
             return result
 
-    def print_results(self, results=None, results_header=None, sort=False, reverse=False) -> None:
-        self._print_results(results=results, results_header=None, sort=sort, reverse=reverse)
+    def print_results(self, results=None, results_header=None, sort=True, reverse=False, compare=False) -> None:
+        self._print_results(results=results, results_header=None, sort=sort, reverse=reverse, compare=compare)
 
-    def _print_results(self, results=None, results_header=None, sort=False, reverse=False) -> None:
+    def _print_results(self, results=None, results_header=None, sort=True, reverse=False, compare=False) -> None:
         if results_header is None:
             results_header = self.results_header
         if results is None:
             results = self.results
         print(results_header)
+        func_names = list(results.keys())
         if sort:
-            results = {func_name: results[func_name] for func_name in sorted(results, key=results.get, reverse=reverse)}
-        for func_name in results:
-            print(f"{func_name:12}: {results[func_name]:6.2f}")
+            func_names = sorted(results, key=results.get, reverse=reverse)
+            results = {func_name: results[func_name] for func_name in func_names}
+        best_res = results[func_names[0]]
+        for func_name in func_names:
+            line = f"{func_name:12}: {results[func_name]:6.2f}"
+            if compare:
+                line += f" {(best_res / results[func_name]) - 1:0.1%}"
+            print(line)
 
     def __str__(self) -> str:
         return ', '.join(self.bench_func_dict.keys())
@@ -117,9 +123,9 @@ class BenchmarkIter(Benchmark):
                     pbar.update(1)
         return inner
 
-    def print_results_per_item(self, sort=False, reverse=True) -> None:
+    def print_results_per_item(self, sort=False, reverse=True, compare=False) -> None:
         num_items = len(self.item_list)
         results = self.results
         results = {func_name: (1 / results[func_name] * num_items) for func_name in results}
         results_header = ' Func name  | Items/sec'
-        self._print_results(results=results, results_header=results_header, sort=sort, reverse=reverse)
+        self._print_results(results=results, results_header=results_header, sort=sort, reverse=reverse, compare=compare)
