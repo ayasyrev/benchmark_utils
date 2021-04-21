@@ -5,6 +5,7 @@ from time import sleep
 def func_to_test(sleep_time: float = 0.1) -> None:
     sleep(sleep_time)
 
+
 def func_to_test_2(sleep_time: float = 0.1) -> None:
     sleep(sleep_time)
 
