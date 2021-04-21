@@ -7,6 +7,7 @@ from setuptools import Command, find_packages, setup
 
 # Package meta-data.
 NAME = "benchmark_utils"
+VERSION = "0.1.2"
 DESCRIPTION = "Utils for benchmark."
 URL = "https://github.com/ayasyrev/benchmark_utils"
 EMAIL = "a.yasyrev@gmail.com"
@@ -26,11 +27,11 @@ except FileNotFoundError:
 EXTRAS = {"test": ["pytest"]}
 
 # Load the package's __version__ from __init__.py module as a dictionary.
-about = {}
-with open(os.path.join(here, NAME, "__init__.py")) as f:
-    exec(f.read(), about)
+# about = {}
+# with open(os.path.join(here, NAME, "__init__.py")) as f:
+#     exec(f.read(), about)
 
-VERSION = about['__version__']
+# VERSION = about['__version__']
 
 
 def get_test_requirements():
