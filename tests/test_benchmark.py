@@ -5,6 +5,9 @@ from time import sleep
 def func_to_test(sleep_time: float = 0.1) -> None:
     sleep(sleep_time)
 
+def func_to_test_2(sleep_time: float = 0.1) -> None:
+    sleep(sleep_time)
+
 
 def equal_near(item_1: float, item_2: float, thresold: float = 0.1) -> bool:
     """Is two item close to equl?
@@ -47,6 +50,8 @@ def test_benchmark():
     bench = benchmark.Benchmark(func_to_test)
     assert repr(bench) == 'func_to_test'
     benchmark.benchmark(func_to_test)
+    bench = benchmark.Benchmark([func_to_test, func_to_test_2])
+    assert repr(bench) == 'func_to_test, func_to_test_2'
     bench()
     bench.print_results()
     bench.print_results(sort=True)

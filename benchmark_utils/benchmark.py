@@ -16,11 +16,13 @@ def benchmark(func: Callable, num_repeats: int = 5, name: str = '') -> List[floa
 
 class Benchmark:
     """Bench func, num_repeats times"""
-    def __init__(self, func: Union[callable, Dict[str, callable]], num_repeats: int = 5):
+    def __init__(self, func: Union[callable, Dict[str, callable], List[Callable]], num_repeats: int = 5):
         self.num_repeats = num_repeats
         self._results = None
         if type(func) == dict:
             self.bench_func_dict = func
+        elif type(func) == list:
+            self.bench_func_dict = {f.__name__: f for f in func}
         else:
             self.bench_func_dict = {func.__name__: func}
         self._benchmark = benchmark
