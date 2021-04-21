@@ -67,7 +67,7 @@ class Benchmark:
                 result[res] = sum(self._results[res]) / len(self._results[res])
             return result
 
-    def print_results(self, results=None, results_header=None, sort=True, reverse=False, compare=False) -> None:
+    def print_results(self, results=None, results_header=None, sort=True, reverse=False, compare=True) -> None:
         self._print_results(results=results, results_header=None, sort=sort, reverse=reverse, compare=compare)
 
     def _print_results(self, results=None, results_header=None, sort=True, reverse=False, compare=False) -> None:
