@@ -1,16 +1,17 @@
 from timeit import timeit
 from typing import Union, Dict, List, Callable
-from tqdm.autonotebook import tqdm
+from rich.progress import Progress
 
 
-def benchmark(func: Callable, num_repeats: int = 5, name: str = '') -> List[float]:
+def benchmark(name: str, func: Callable, num_repeats: int, progress_bar: Progress) -> List[float]:
     """Return list of run times for func, num_repeats times"""
     run_times = []
-    with tqdm(total=num_repeats, leave=False) as pbar:
-        for i in range(num_repeats):
-            pbar.set_description(f"{name}: run {i + 1}/{num_repeats}")
-            run_times.append(timeit(func, number=1))
-            pbar.update(1)
+    text_color = '[blue]'
+    task = progress_bar.add_task(f"{text_color}{name}", total=num_repeats)
+    for i in range(num_repeats):
+        progress_bar.tasks[task].description = f"{text_color}{name}: run {i + 1}/{num_repeats}"
+        run_times.append(timeit(func, number=1))
+        progress_bar.update(task, advance=1)
     return run_times
 
 
@@ -43,16 +44,21 @@ class Benchmark:
         if num_repeats is None:
             num_repeats = self.num_repeats
         self._results = {}  # ? if exists add new
-        progress_bar = tqdm(total=len(bench_func_dict.keys()))
-        for func_name in bench_func_dict:
-            progress_bar.set_description(f"running {func_name}")
-            self._results[func_name] = self._run_benchmark(func_name, num_repeats=num_repeats)
-            progress_bar.update(1)
+        func_names = bench_func_dict.keys()
+        num_funcs = len(func_names)
+        text_color = "[green]"
+        with Progress(transient=True) as progress_bar:
+            self.progress_bar = progress_bar
+            main_task = self.progress_bar.add_task("starting...", total=num_funcs)
+            for num, func_name in enumerate(func_names):
+                self.progress_bar.tasks[main_task].description = f"{text_color}running {func_name} {num + 1}/{num_funcs}"  # noqa 501
+                self._results[func_name] = self._run_benchmark(func_name, num_repeats=num_repeats)
+                self.progress_bar.update(main_task, advance=1)
 
         self.print_results()
 
     def _run_benchmark(self, func_name: str, num_repeats: int):
-        return self._benchmark(self.bench_func_dict[func_name], num_repeats)
+        return self._benchmark(func_name, self.bench_func_dict[func_name], num_repeats, self.progress_bar)
 
     def __call__(self, num_repeats: Union[int, None] = None) -> None:
         if num_repeats is None:
@@ -104,25 +110,25 @@ class BenchmarkIter(Benchmark):
         self.exeptions = None
 
     def _run_benchmark(self, func_name: str, num_repeats: int):
-        return self._benchmark(self.run_func_iter(func_name), num_repeats, func_name)
+        return self._benchmark(func_name, self.run_func_iter(func_name), num_repeats, self.progress_bar)
 
     def run_func_iter(self, func_name: str) -> Callable:
         """Return func, that run func over item_list"""
         def inner(self=self, func_name=func_name):
             func = self.bench_func_dict[func_name]
-            with tqdm(total=len(self.item_list), leave=False, desc=func_name) as pbar:
-                for item in self.item_list:
-                    try:
-                        func(item)
-                    except Exception as expt:
-                        if self.exeptions is None:
-                            self.exeptions = {}
-                        exception_info = {'exeption': expt, 'item': item}
-                        if func_name in self.exeptions.keys():
-                            self.exeptions[func_name].append(exception_info)
-                        else:
-                            self.exeptions[func_name] = [exception_info]
-                    pbar.update(1)
+            task = self.progress_bar.add_task(f"running {func_name}", total=len(self.item_list))
+            for item in self.item_list:
+                try:
+                    func(item)
+                except Exception as expt:
+                    if self.exeptions is None:
+                        self.exeptions = {}
+                    exception_info = {'exeption': expt, 'item': item}
+                    if func_name in self.exeptions.keys():
+                        self.exeptions[func_name].append(exception_info)
+                    else:
+                        self.exeptions[func_name] = [exception_info]
+                self.progress_bar.update(task, advance=1)
         return inner
 
     def print_results_per_item(self, sort=False, reverse=True, compare=False) -> None:
