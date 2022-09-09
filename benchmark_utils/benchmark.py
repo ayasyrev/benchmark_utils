@@ -116,7 +116,7 @@ class BenchmarkIter(Benchmark):
         """Return func, that run func over item_list"""
         def inner(self=self, func_name=func_name):
             func = self.bench_func_dict[func_name]
-            task = self.progress_bar.add_task(f"running {func_name}", total=len(self.item_list))
+            task = self.progress_bar.add_task(f"iterating {func_name}", total=len(self.item_list))
             for item in self.item_list:
                 try:
                     func(item)
@@ -129,6 +129,8 @@ class BenchmarkIter(Benchmark):
                     else:
                         self.exeptions[func_name] = [exception_info]
                 self.progress_bar.update(task, advance=1)
+            # self.progress_bar.remove_task(task)
+            self.progress_bar.tasks[task].visible = False
         return inner
 
     def print_results_per_item(self, sort=False, reverse=True, compare=False) -> None:
