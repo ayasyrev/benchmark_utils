@@ -1,5 +1,6 @@
 from timeit import timeit
-from typing import Union, Dict, List, Callable
+from typing import Callable, Dict, List, Union
+
 from rich.progress import Progress
 
 
@@ -17,13 +18,14 @@ def benchmark(name: str, func: Callable, num_repeats: int, progress_bar: Progres
 
 class Benchmark:
     """Bench func, num_repeats times"""
-    def __init__(self, func: Union[callable, Dict[str, callable], List[Callable]], num_repeats: int = 5):
+    def __init__(self, func: Union[Callable, Dict[str, Callable], List[Callable]], num_repeats: int = 5):
         self.num_repeats = num_repeats
         self._results = None
-        if type(func) == dict:
+        self.bench_func_dict: Dict[str, Callable]
+        if isinstance(func, dict):
             self.bench_func_dict = func
-        elif type(func) == list:
-            self.bench_func_dict = {f.__name__: f for f in func}
+        elif isinstance(func, list):
+            self.bench_func_dict = {fn.__name__: fn for fn in func}
         else:
             self.bench_func_dict = {func.__name__: func}
         self._benchmark = benchmark
@@ -40,7 +42,7 @@ class Benchmark:
             else:
                 print(f'Func_name {func_name} is not in bench_func_dict')
 
-    def _run(self, bench_func_dict: dict, num_repeats: Union[int, None] = None) -> None:
+    def _run(self, bench_func_dict: Dict[str, Callable], num_repeats: Union[int, None] = None) -> None:
         if num_repeats is None:
             num_repeats = self.num_repeats
         self._results = {}  # ? if exists add new
@@ -66,7 +68,7 @@ class Benchmark:
         self._run(self.bench_func_dict, num_repeats)
 
     @property
-    def results(self) -> dict:
+    def results(self) -> Dict[str, float]:
         if self._results is None:
             return {}
         else:
@@ -78,7 +80,14 @@ class Benchmark:
     def print_results(self, results=None, results_header=None, sort=True, reverse=False, compare=True) -> None:
         self._print_results(results=results, results_header=None, sort=sort, reverse=reverse, compare=compare)
 
-    def _print_results(self, results=None, results_header=None, sort=True, reverse=False, compare=False) -> None:
+    def _print_results(
+        self,
+        results: Union[Dict[str, float], None] = None,
+        results_header=None,
+        sort=True,
+        reverse=False,
+        compare=False,
+    ) -> None:
         if results_header is None:
             results_header = self.results_header
         if results is None:
@@ -86,7 +95,7 @@ class Benchmark:
         print(results_header)
         func_names = list(results.keys())
         if sort:
-            func_names = sorted(results, key=results.get, reverse=reverse)
+            func_names = sorted(results, key=results.get, reverse=reverse)  # type: ignore
             results = {func_name: results[func_name] for func_name in func_names}
         best_res = results[func_names[0]]
         for func_name in func_names:
@@ -104,7 +113,7 @@ class Benchmark:
 
 class BenchmarkIter(Benchmark):
     """Benchmark func over item_list"""
-    def __init__(self, func: Union[callable, Dict[str, callable]], item_list: List = [], num_repeats: int = 5):
+    def __init__(self, func: Union[Callable, Dict[str, Callable]], item_list: List = [], num_repeats: int = 5):
         super().__init__(func, num_repeats=num_repeats)
         self.item_list = item_list
         self.exeptions = None
