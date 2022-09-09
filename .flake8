@@ -5,3 +5,7 @@ max-line-length = 120
 
 application-import-names = benchmark_utils, tests
 import-order-style = google
+
+per-file-ignores =
+    # imported but unused
+    __init__.py: F401
