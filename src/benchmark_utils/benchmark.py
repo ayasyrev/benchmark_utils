@@ -5,22 +5,29 @@ from rich import print
 from rich.progress import Progress
 
 
-def benchmark(name: str, func: Callable, num_repeats: int, progress_bar: Progress) -> List[float]:
+def benchmark(
+    name: str, func: Callable, num_repeats: int, progress_bar: Progress
+) -> List[float]:
     """Return list of run times for func, num_repeats times"""
     run_times = []
-    text_color = '[blue]'
+    text_color = "[blue]"
     task = progress_bar.add_task(f"{text_color}{name}", total=num_repeats)
     for i in range(num_repeats):
-        progress_bar.tasks[task].description = f"{text_color}{name}: run {i + 1}/{num_repeats}"
+        progress_bar.tasks[
+            task
+        ].description = f"{text_color}{name}: run {i + 1}/{num_repeats}"
         run_times.append(timeit(func, number=1))
         progress_bar.update(task, advance=1)
     avg_run_time = sum(run_times) / len(run_times)
-    progress_bar.tasks[task].description = f"{text_color}{name}: {avg_run_time:0.2f} sec."
+    progress_bar.tasks[
+        task
+    ].description = f"{text_color}{name}: {avg_run_time:0.2f} sec."
     return run_times
 
 
 class Benchmark:
     """Bench func, num_repeats times"""
+
     def __init__(
         self,
         func: Union[Callable, Dict[str, Callable], List[Callable]],
@@ -37,10 +44,12 @@ class Benchmark:
         else:
             self.bench_func_dict = {func.__name__: func}
         self._benchmark = benchmark
-        self.results_header = ' Func name  | Sec / run'
+        self.results_header = " Func name  | Sec / run"
         self.clear_progress = clear_progress
 
-    def run(self, func_name: Union[str, None] = None, num_repeats: Union[int, None] = None) -> None:
+    def run(
+        self, func_name: Union[str, None] = None, num_repeats: Union[int, None] = None
+    ) -> None:
         if func_name is None:
             self._run(self.bench_func_dict, num_repeats)
         else:
@@ -49,9 +58,11 @@ class Benchmark:
                 bench_func_dict = {func_name: func}
                 self._run(bench_func_dict, num_repeats)
             else:
-                print(f'Func_name {func_name} is not in bench_func_dict')
+                print(f"Func_name {func_name} is not in bench_func_dict")
 
-    def _run(self, bench_func_dict: Dict[str, Callable], num_repeats: Union[int, None] = None) -> None:
+    def _run(
+        self, bench_func_dict: Dict[str, Callable], num_repeats: Union[int, None] = None
+    ) -> None:
         if num_repeats is None:
             num_repeats = self.num_repeats
         self._results = {}  # ? if exists add new
@@ -63,15 +74,28 @@ class Benchmark:
             self.progress_bar = progress_bar
             main_task = self.progress_bar.add_task("starting...", total=num_funcs)
             for num, func_name in enumerate(func_names):
-                self.progress_bar.tasks[main_task].description = f"{text_color}running {func_name} {num + 1}/{num_funcs}"  # noqa 501
-                self._results[func_name] = self._run_benchmark(func_name, num_repeats=num_repeats)
+                self.progress_bar.tasks[
+                    main_task
+                ].description = (
+                    f"{text_color}running {func_name} {num + 1}/{num_funcs}"  # noqa 501
+                )
+                self._results[func_name] = self._run_benchmark(
+                    func_name, num_repeats=num_repeats
+                )
                 self.progress_bar.update(main_task, advance=1)
-            self.progress_bar.tasks[main_task].description = f"{text_color}done {num_funcs} runs."  # noqa 501
+            self.progress_bar.tasks[
+                main_task
+            ].description = f"{text_color}done {num_funcs} runs."  # noqa 501
 
         self.print_results()
 
     def _run_benchmark(self, func_name: str, num_repeats: int):
-        return self._benchmark(f"{func_name:{self._max_name_len}}", self.bench_func_dict[func_name], num_repeats, self.progress_bar)
+        return self._benchmark(
+            f"{func_name:{self._max_name_len}}",
+            self.bench_func_dict[func_name],
+            num_repeats,
+            self.progress_bar,
+        )
 
     def __call__(self, num_repeats: Union[int, None] = None) -> None:
         if num_repeats is None:
@@ -88,8 +112,16 @@ class Benchmark:
                 result[res] = sum(self._results[res]) / len(self._results[res])
             return result
 
-    def print_results(self, results=None, results_header=None, sort=True, reverse=False, compare=True) -> None:
-        self._print_results(results=results, results_header=None, sort=sort, reverse=reverse, compare=compare)
+    def print_results(
+        self, results=None, results_header=None, sort=True, reverse=False, compare=True
+    ) -> None:
+        self._print_results(
+            results=results,
+            results_header=None,
+            sort=sort,
+            reverse=reverse,
+            compare=compare,
+        )
 
     def _print_results(
         self,
@@ -116,40 +148,49 @@ class Benchmark:
             print(line)
 
     def __str__(self) -> str:
-        return ', '.join(self.bench_func_dict.keys())
+        return ", ".join(self.bench_func_dict.keys())
 
     def __repr__(self) -> str:
-        return ', '.join(self.bench_func_dict.keys())
+        return ", ".join(self.bench_func_dict.keys())
 
 
 class BenchmarkIter(Benchmark):
     """Benchmark func over item_list"""
+
     def __init__(
         self,
         func: Union[Callable, Dict[str, Callable]],
         item_list: List = [],
         num_repeats: int = 5,
         clear_progress: bool = True,
-):
+    ):
         super().__init__(func, num_repeats=num_repeats, clear_progress=clear_progress)
         self.item_list = item_list
         self.exeptions = None
 
     def _run_benchmark(self, func_name: str, num_repeats: int):
-        return self._benchmark(f"{func_name:{self._max_name_len}}", self.run_func_iter(func_name), num_repeats, self.progress_bar)
+        return self._benchmark(
+            f"{func_name:{self._max_name_len}}",
+            self.run_func_iter(func_name),
+            num_repeats,
+            self.progress_bar,
+        )
 
     def run_func_iter(self, func_name: str) -> Callable:
         """Return func, that run func over item_list"""
+
         def inner(self=self, func_name=func_name):
             func = self.bench_func_dict[func_name]
-            task = self.progress_bar.add_task(f"iterating {func_name}", total=len(self.item_list))
+            task = self.progress_bar.add_task(
+                f"iterating {func_name}", total=len(self.item_list)
+            )
             for item in self.item_list:
                 try:
                     func(item)
                 except Exception as expt:
                     if self.exeptions is None:
                         self.exeptions = {}
-                    exception_info = {'exeption': expt, 'item': item}
+                    exception_info = {"exeption": expt, "item": item}
                     if func_name in self.exeptions.keys():
                         self.exeptions[func_name].append(exception_info)
                     else:
@@ -157,11 +198,20 @@ class BenchmarkIter(Benchmark):
                 self.progress_bar.update(task, advance=1)
             # self.progress_bar.remove_task(task)
             self.progress_bar.tasks[task].visible = False
+
         return inner
 
     def print_results_per_item(self, sort=False, reverse=True, compare=False) -> None:
         num_items = len(self.item_list)
         results = self.results
-        results = {func_name: (1 / results[func_name] * num_items) for func_name in results}
-        results_header = ' Func name  | Items/sec'
-        self._print_results(results=results, results_header=results_header, sort=sort, reverse=reverse, compare=compare)
+        results = {
+            func_name: (1 / results[func_name] * num_items) for func_name in results
+        }
+        results_header = " Func name  | Items/sec"
+        self._print_results(
+            results=results,
+            results_header=results_header,
+            sort=sort,
+            reverse=reverse,
+            compare=compare,
+        )
