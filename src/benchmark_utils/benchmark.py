@@ -18,10 +18,10 @@ def benchmark(
         ].description = f"{text_color}{name}: run {i + 1}/{num_repeats}"
         run_times.append(timeit(func, number=1))
         progress_bar.update(task, advance=1)
-    avg_run_time = sum(run_times) / len(run_times)
+    run_time_avg = sum(run_times) / len(run_times)
     progress_bar.tasks[
         task
-    ].description = f"{text_color}{name}: {avg_run_time:0.2f} sec."
+    ].description = f"{text_color}{name}: {run_time_avg:0.2f} sec/run."
     return run_times
 
 
@@ -71,6 +71,7 @@ class Benchmark:
         self._max_name_len = max(len(func_name) for func_name in func_names)
         text_color = "[green]"
         with Progress(transient=self.clear_progress) as progress_bar:
+            progress_bar.columns[3].elapsed_when_finished = True
             self.progress_bar = progress_bar
             main_task = self.progress_bar.add_task("starting...", total=num_funcs)
             for num, func_name in enumerate(func_names):
