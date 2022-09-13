@@ -1,6 +1,7 @@
 from timeit import timeit
 from typing import Callable, Dict, List, Union
 
+from rich import print
 from rich.progress import Progress
 
 
@@ -13,12 +14,19 @@ def benchmark(name: str, func: Callable, num_repeats: int, progress_bar: Progres
         progress_bar.tasks[task].description = f"{text_color}{name}: run {i + 1}/{num_repeats}"
         run_times.append(timeit(func, number=1))
         progress_bar.update(task, advance=1)
+    avg_run_time = sum(run_times) / len(run_times)
+    progress_bar.tasks[task].description = f"{text_color}{name}: {avg_run_time:0.2f} sec."
     return run_times
 
 
 class Benchmark:
     """Bench func, num_repeats times"""
-    def __init__(self, func: Union[Callable, Dict[str, Callable], List[Callable]], num_repeats: int = 5):
+    def __init__(
+        self,
+        func: Union[Callable, Dict[str, Callable], List[Callable]],
+        num_repeats: int = 5,
+        clear_progress: bool = True,
+    ):
         self.num_repeats = num_repeats
         self._results = None
         self.bench_func_dict: Dict[str, Callable]
@@ -30,6 +38,7 @@ class Benchmark:
             self.bench_func_dict = {func.__name__: func}
         self._benchmark = benchmark
         self.results_header = ' Func name  | Sec / run'
+        self.clear_progress = clear_progress
 
     def run(self, func_name: Union[str, None] = None, num_repeats: Union[int, None] = None) -> None:
         if func_name is None:
@@ -48,19 +57,21 @@ class Benchmark:
         self._results = {}  # ? if exists add new
         func_names = bench_func_dict.keys()
         num_funcs = len(func_names)
+        self._max_name_len = max(len(func_name) for func_name in func_names)
         text_color = "[green]"
-        with Progress(transient=True) as progress_bar:
+        with Progress(transient=self.clear_progress) as progress_bar:
             self.progress_bar = progress_bar
             main_task = self.progress_bar.add_task("starting...", total=num_funcs)
             for num, func_name in enumerate(func_names):
                 self.progress_bar.tasks[main_task].description = f"{text_color}running {func_name} {num + 1}/{num_funcs}"  # noqa 501
                 self._results[func_name] = self._run_benchmark(func_name, num_repeats=num_repeats)
                 self.progress_bar.update(main_task, advance=1)
+            self.progress_bar.tasks[main_task].description = f"{text_color}done {num_funcs} runs."  # noqa 501
 
         self.print_results()
 
     def _run_benchmark(self, func_name: str, num_repeats: int):
-        return self._benchmark(func_name, self.bench_func_dict[func_name], num_repeats, self.progress_bar)
+        return self._benchmark(f"{func_name:{self._max_name_len}}", self.bench_func_dict[func_name], num_repeats, self.progress_bar)
 
     def __call__(self, num_repeats: Union[int, None] = None) -> None:
         if num_repeats is None:
@@ -113,13 +124,19 @@ class Benchmark:
 
 class BenchmarkIter(Benchmark):
     """Benchmark func over item_list"""
-    def __init__(self, func: Union[Callable, Dict[str, Callable]], item_list: List = [], num_repeats: int = 5):
-        super().__init__(func, num_repeats=num_repeats)
+    def __init__(
+        self,
+        func: Union[Callable, Dict[str, Callable]],
+        item_list: List = [],
+        num_repeats: int = 5,
+        clear_progress: bool = True,
+):
+        super().__init__(func, num_repeats=num_repeats, clear_progress=clear_progress)
         self.item_list = item_list
         self.exeptions = None
 
     def _run_benchmark(self, func_name: str, num_repeats: int):
-        return self._benchmark(func_name, self.run_func_iter(func_name), num_repeats, self.progress_bar)
+        return self._benchmark(f"{func_name:{self._max_name_len}}", self.run_func_iter(func_name), num_repeats, self.progress_bar)
 
     def run_func_iter(self, func_name: str) -> Callable:
         """Return func, that run func over item_list"""
