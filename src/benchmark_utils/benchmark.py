@@ -1,5 +1,5 @@
 from timeit import timeit
-from typing import Callable, Dict, List, Union
+from typing import Any, Callable, Dict, List, Union
 
 from rich import print
 from rich.progress import Progress
@@ -87,6 +87,8 @@ class Benchmark:
             self.progress_bar.tasks[
                 main_task
             ].description = f"{text_color}done {num_funcs} runs."  # noqa 501
+            columns = self.progress_bar.columns
+            self.progress_bar.columns = columns[0], columns[3]  # remove BarColumn and TaskProgressColumn
 
         self.print_results()
 
@@ -161,7 +163,7 @@ class BenchmarkIter(Benchmark):
     def __init__(
         self,
         func: Union[Callable, Dict[str, Callable]],
-        item_list: List = [],
+        item_list: List[Any],
         num_repeats: int = 5,
         clear_progress: bool = True,
     ):
