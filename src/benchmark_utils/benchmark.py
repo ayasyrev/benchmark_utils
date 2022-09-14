@@ -2,7 +2,13 @@ from timeit import timeit
 from typing import Any, Callable, Dict, List, Union
 
 from rich import print
-from rich.progress import Progress
+from rich.progress import (
+    Progress,
+    TextColumn,
+    BarColumn,
+    TaskProgressColumn,
+    TimeRemainingColumn,
+)
 
 
 def benchmark(
@@ -70,25 +76,31 @@ class Benchmark:
         num_funcs = len(func_names)
         self._max_name_len = max(len(func_name) for func_name in func_names)
         text_color = "[green]"
-        with Progress(transient=self.clear_progress) as progress_bar:
-            progress_bar.columns[3].elapsed_when_finished = True
+        with Progress(
+            TextColumn("[progress.description]{task.description}"),
+            BarColumn(),
+            TaskProgressColumn(),
+            TimeRemainingColumn(elapsed_when_finished=True),
+            transient=self.clear_progress,
+        ) as progress_bar:
             self.progress_bar = progress_bar
             main_task = self.progress_bar.add_task("starting...", total=num_funcs)
             for num, func_name in enumerate(func_names):
                 self.progress_bar.tasks[
                     main_task
-                ].description = (
-                    f"{text_color}running {func_name} {num + 1}/{num_funcs}"  # noqa 501
-                )
+                ].description = f"{text_color}running {func_name} {num + 1}/{num_funcs}"
                 self._results[func_name] = self._run_benchmark(
                     func_name, num_repeats=num_repeats
                 )
                 self.progress_bar.update(main_task, advance=1)
             self.progress_bar.tasks[
                 main_task
-            ].description = f"{text_color}done {num_funcs} runs."  # noqa 501
+            ].description = f"{text_color}done {num_funcs} runs."
             columns = self.progress_bar.columns
-            self.progress_bar.columns = columns[0], columns[3]  # remove BarColumn and TaskProgressColumn
+            self.progress_bar.columns = (
+                columns[0],
+                columns[3],
+            )  # remove BarColumn and TaskProgressColumn
 
         self.print_results()
 
