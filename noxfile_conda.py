@@ -5,7 +5,5 @@ import nox
 def tests(session):
     args = session.posargs or ["--cov"]
     session.conda_install('--file', 'requirements_test.txt')
-    # session.install('.', '--no-deps')
     session.install('.')
-    # session.install(".", "pytest", "pytest-cov", "coverage[toml]")
     session.run("pytest", *args)
