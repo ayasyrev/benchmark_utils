@@ -10,19 +10,19 @@ def func_to_test_2(sleep_time: float = 0.1) -> None:
     sleep(sleep_time)
 
 
-def equal_near(item_1: float, item_2: float, thresold: float = 0.1) -> bool:
-    """Is two item close to equl?
-    Return True is difference less than thresold.
+def equal_near(item_1: float, item_2: float, threshold: float = 0.1) -> bool:
+    """Is two item close to equal?
+    Return True is difference less than threshold.
 
     Args:
         item_1 (float): First item.
         item_2 (float): Second item.
-        thresold (float, optional): Thresold for compare. Defaults to 0.01.
+        threshold (float, optional): Threshold for compare. Defaults to 0.01.
 
     Returns:
-        bool: Return True if difference less than thresold.
+        bool: Return True if difference less than threshold.
     """
-    return abs(1 - (item_1 / item_2)) < thresold
+    return abs(1 - (item_1 / item_2)) < threshold
 
 
 def test_equal_near():
@@ -42,7 +42,7 @@ def test_benchmark():
     assert repr(bench) == name_func
     bench()
     result = bench.results[name_func]
-    assert equal_near(result, sleep_time, thresold=0.5)
+    assert equal_near(result, sleep_time, threshold=0.5)
     assert str(bench) == name_func
     bench(1)
     bench.run()
@@ -63,14 +63,14 @@ def test_benchmark_iter():
     name_func = 'test_func'
     len_item_list = 3
     sleep_time = 0.01
-    list_iten_sleep_time = len_item_list * [sleep_time]
-    bench = benchmark.BenchmarkIter(func={name_func: func_to_test}, item_list=list_iten_sleep_time)
+    list_item_sleep_time = len_item_list * [sleep_time]
+    bench = benchmark.BenchmarkIter(func={name_func: func_to_test}, item_list=list_item_sleep_time)
     assert bench.__repr__() == name_func
     assert repr(bench) == name_func
     bench()
     result = bench.results[name_func]
     print(result)
-    assert equal_near(result, sleep_time * len_item_list, thresold=0.5)
+    assert equal_near(result, sleep_time * len_item_list, threshold=0.5)
     bench.print_results_per_item()
 
 
@@ -84,8 +84,8 @@ def func_with_exception(input: bool) -> None:
 def test_benchmark_iter_wrong_item():
     item_list = [True, False]
     bench = benchmark.BenchmarkIter(func=func_with_exception, item_list=item_list)
-    assert bench.exeptions is None
+    assert bench.exceptions is None
     assert bench.__repr__() == 'func_with_exception'
     assert repr(bench) == 'func_with_exception'
     bench()
-    assert bench.exeptions is not None
+    assert bench.exceptions is not None

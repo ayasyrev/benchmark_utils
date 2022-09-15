@@ -181,7 +181,7 @@ class BenchmarkIter(Benchmark):
     ):
         super().__init__(func, num_repeats=num_repeats, clear_progress=clear_progress)
         self.item_list = item_list
-        self.exeptions = None
+        self.exceptions = None
 
     def _run_benchmark(self, func_name: str, num_repeats: int):
         return self._benchmark(
@@ -202,14 +202,14 @@ class BenchmarkIter(Benchmark):
             for item in self.item_list:
                 try:
                     func(item)
-                except Exception as expt:
-                    if self.exeptions is None:
-                        self.exeptions = {}
-                    exception_info = {"exeption": expt, "item": item}
-                    if func_name in self.exeptions.keys():
-                        self.exeptions[func_name].append(exception_info)
+                except Exception as excpt:
+                    if self.exceptions is None:
+                        self.exceptions = {}
+                    exception_info = {"exception": excpt, "item": item}
+                    if func_name in self.exceptions.keys():
+                        self.exceptions[func_name].append(exception_info)
                     else:
-                        self.exeptions[func_name] = [exception_info]
+                        self.exceptions[func_name] = [exception_info]
                 self.progress_bar.update(task, advance=1)
             # self.progress_bar.remove_task(task)
             self.progress_bar.tasks[task].visible = False
