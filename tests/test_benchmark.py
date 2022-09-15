@@ -99,15 +99,14 @@ def test_benchmark():
     assert "func_to_test" in bench._results
     # wrong name, nothing to test, empty _results
     bench.run(func_name="func_to_test_wrong_1")
-    assert bench._results is not None
+    assert bench._results == {}
     assert len(bench._results) == 0
     # wrong name in list, only one test
-    bench.run(func_name=["func_to_test_wrong_1", "func_to_test_2"])
-    assert bench._results is not None
+    bench.run(func_name=["func_to_test_wrong_2", "func_to_test_2"])
     assert len(bench._results) == 1
     assert "func_to_test_2" in bench._results
     # wrong name in exclude -> all tests
-    bench.run(exclude=["func_to_test_wrong_2"])
+    bench.run(exclude=["func_to_test_wrong_3"])
     assert bench._results is not None
     assert len(bench._results) == 2
     # assert "func_to_test_2" not in bench._results
@@ -137,6 +136,10 @@ def func_with_exception(input: bool) -> None:
         raise Exception("error")
 
 
+def func_dummy(input: bool) -> None:
+    pass
+
+
 def test_benchmark_iter_wrong_item():
     item_list = [True, False]
     bench = benchmark.BenchmarkIter(func=func_with_exception, item_list=item_list)
@@ -145,3 +148,26 @@ def test_benchmark_iter_wrong_item():
     assert repr(bench) == "func_with_exception"
     bench()
     assert bench.exceptions is not None
+    assert len(bench.exceptions) == 1
+    # dict of func
+    bench = benchmark.BenchmarkIter(
+        func={
+            "func_1": func_with_exception,
+            "func_2": func_dummy,
+        },
+        item_list=item_list,
+    )
+    assert bench.exceptions is None
+    assert bench.__repr__() == "func_1, func_2"
+    assert repr(bench) == "func_1, func_2"
+    # run
+    bench()
+    assert bench._results is not None
+    assert bench.exceptions is not None
+    assert len(bench.exceptions) == 1
+    assert len(bench._results) == 2
+    # new run w/0 exceptions
+    bench.run("func_2")
+    assert bench._results is not None
+    assert bench.exceptions is None
+    assert len(bench._results) == 1

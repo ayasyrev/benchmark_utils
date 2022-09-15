@@ -1,3 +1,4 @@
+from queue import Empty
 from timeit import timeit
 from typing import Any, Callable, Dict, List, Union
 
@@ -41,7 +42,7 @@ class Benchmark:
         clear_progress: bool = True,
     ):
         self.num_repeats = num_repeats
-        self._results: Union[None, Dict[str, List[float]]] = None
+        self._results: Dict[str, List[float]] = {}
         self.bench_func_dict: Dict[str, Callable]
         if isinstance(func, dict):
             self.bench_func_dict = func
@@ -56,10 +57,9 @@ class Benchmark:
     def run(
         self,
         func_name: Union[str, None, List[str]] = None,
-        num_repeats: Union[int, None] = None,
         exclude: Union[str, List[str], None] = None,
+        num_repeats: Union[int, None] = None,
     ) -> None:
-        self._results = {}
         if func_name:
             if isinstance(func_name, str):
                 func_name = [func_name]
@@ -82,55 +82,58 @@ class Benchmark:
         else:
             func_to_test = self.bench_func_dict
 
-        if len(func_to_test) == 0:
-            print("Nothing to test")
-        else:
-            self._run(func_to_test, num_repeats)
+        self._run(func_to_test, num_repeats)
 
     def _print_missed(self, func_names: List[str]) -> None:
         for func in func_names:
             if func not in self.bench_func_dict:
                 print(f"{func} is not in bench_func_dict")
 
+    def _reset_results(self) -> None:
+        self._results = {}  # ? if exists add new
+
     def _run(
         self, bench_func_dict: Dict[str, Callable], num_repeats: Union[int, None] = None
     ) -> None:
-        if num_repeats is None:
-            num_repeats = self.num_repeats
-        self._results = {}  # ? if exists add new
-        func_names = bench_func_dict.keys()
-        num_funcs = len(func_names)
-        self._max_name_len = max(len(func_name) for func_name in func_names)
-        text_color = "[green]"
-        with Progress(
-            TextColumn("[progress.description]{task.description}"),
-            BarColumn(),
-            TaskProgressColumn(),
-            TimeRemainingColumn(elapsed_when_finished=True),
-            transient=self.clear_progress,
-        ) as progress_bar:
-            self.progress_bar = progress_bar
-            main_task = self.progress_bar.add_task("starting...", total=num_funcs)
-            for num, func_name in enumerate(func_names):
+        self._reset_results()
+        if len(bench_func_dict) == 0:
+            print("Nothing to test")
+        else:
+            if num_repeats is None:
+                num_repeats = self.num_repeats
+            func_names = bench_func_dict.keys()
+            num_funcs = len(func_names)
+            self._max_name_len = max(len(func_name) for func_name in func_names)
+            text_color = "[green]"
+            with Progress(
+                TextColumn("[progress.description]{task.description}"),
+                BarColumn(),
+                TaskProgressColumn(),
+                TimeRemainingColumn(elapsed_when_finished=True),
+                transient=self.clear_progress,
+            ) as progress_bar:
+                self.progress_bar = progress_bar
+                main_task = self.progress_bar.add_task("starting...", total=num_funcs)
+                for num, func_name in enumerate(func_names):
+                    self.progress_bar.tasks[
+                        main_task
+                    ].description = f"{text_color}running {func_name} {num + 1}/{num_funcs}"
+                    self._results[func_name] = self._run_benchmark(
+                        func_name, num_repeats=num_repeats
+                    )
+                    self.progress_bar.update(main_task, advance=1)
                 self.progress_bar.tasks[
                     main_task
-                ].description = f"{text_color}running {func_name} {num + 1}/{num_funcs}"
-                self._results[func_name] = self._run_benchmark(
-                    func_name, num_repeats=num_repeats
-                )
-                self.progress_bar.update(main_task, advance=1)
-            self.progress_bar.tasks[
-                main_task
-            ].description = f"{text_color}done {num_funcs} runs."
-            columns = self.progress_bar.columns
-            self.progress_bar.columns = (
-                columns[0],
-                columns[3],
-            )  # remove BarColumn and TaskProgressColumn
+                ].description = f"{text_color}done {num_funcs} runs."
+                columns = self.progress_bar.columns
+                self.progress_bar.columns = (
+                    columns[0],
+                    columns[3],
+                )  # remove BarColumn and TaskProgressColumn
 
-        self.print_results()
+            self.print_results()
 
-    def _run_benchmark(self, func_name: str, num_repeats: int):
+    def _run_benchmark(self, func_name: str, num_repeats: int) -> List[float]:
         return self._benchmark(
             f"{func_name:{self._max_name_len}}",
             self.bench_func_dict[func_name],
@@ -145,7 +148,7 @@ class Benchmark:
 
     @property
     def results(self) -> Dict[str, float]:
-        if self._results is None:
+        if self._results is Empty:
             return {}
         else:
             result = {}
@@ -207,15 +210,19 @@ class BenchmarkIter(Benchmark):
     ):
         super().__init__(func, num_repeats=num_repeats, clear_progress=clear_progress)
         self.item_list = item_list
-        self.exceptions = None
+        self.exceptions: Union[Dict[str, List[Dict[str, Any]]], None] = None
 
-    def _run_benchmark(self, func_name: str, num_repeats: int):
+    def _run_benchmark(self, func_name: str, num_repeats: int) -> List[float]:
         return self._benchmark(
             f"{func_name:{self._max_name_len}}",
             self.run_func_iter(func_name),
             num_repeats,
             self.progress_bar,
         )
+
+    def _reset_results(self) -> None:
+        self.exceptions = None
+        super()._reset_results()
 
     def run_func_iter(self, func_name: str) -> Callable:
         """Return func, that run func over item_list"""
@@ -237,12 +244,13 @@ class BenchmarkIter(Benchmark):
                     else:
                         self.exceptions[func_name] = [exception_info]
                 self.progress_bar.update(task, advance=1)
-            # self.progress_bar.remove_task(task)
             self.progress_bar.tasks[task].visible = False
 
         return inner
 
     def print_results_per_item(self, sort=False, reverse=True, compare=False) -> None:
+        if self.exceptions is not None:
+            print(f"Got exceptions {len(self.exceptions)}!")
         num_items = len(self.item_list)
         results = self.results
         results = {
