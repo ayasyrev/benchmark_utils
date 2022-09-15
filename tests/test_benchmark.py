@@ -74,12 +74,12 @@ def test_benchmark():
     bench.print_results(
         results={"test_func": 0.1}, results_header="test_func  | sec", compare=True
     )
-    assert len(bench.bench_func_dict) == 2
+    assert len(bench.func_dict) == 2
     # run only one func
     bench.run(func_name="func_to_test")
     assert bench._results is not None
     assert len(bench._results) == 1
-    assert len(bench.bench_func_dict) == 2
+    assert len(bench.func_dict) == 2
     assert "func_to_test" in bench._results
     # exclude one
     bench.run(exclude="func_to_test")
@@ -95,7 +95,7 @@ def test_benchmark():
     bench.run(func_name=["func_to_test"])
     assert bench._results is not None
     assert len(bench._results) == 1
-    assert len(bench.bench_func_dict) == 2
+    assert len(bench.func_dict) == 2
     assert "func_to_test" in bench._results
     # wrong name, nothing to test, empty _results
     bench.run(func_name="func_to_test_wrong_1")

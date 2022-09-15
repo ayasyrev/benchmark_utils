@@ -43,13 +43,13 @@ class Benchmark:
     ):
         self.num_repeats = num_repeats
         self._results: Dict[str, List[float]] = {}
-        self.bench_func_dict: Dict[str, Callable]
+        self.func_dict: Dict[str, Callable]
         if isinstance(func, dict):
-            self.bench_func_dict = func
+            self.func_dict = func
         elif isinstance(func, list):
-            self.bench_func_dict = {fn.__name__: fn for fn in func}
+            self.func_dict = {fn.__name__: fn for fn in func}
         else:
-            self.bench_func_dict = {func.__name__: func}
+            self.func_dict = {func.__name__: func}
         self._benchmark = benchmark
         self.results_header = " Func name  | Sec / run"
         self.clear_progress = clear_progress
@@ -64,7 +64,7 @@ class Benchmark:
             if isinstance(func_name, str):
                 func_name = [func_name]
             func_to_test = dict(
-                filter(lambda item: item[0] in func_name, self.bench_func_dict.items())
+                filter(lambda item: item[0] in func_name, self.func_dict.items())
             )
             if len(func_name) != len(func_to_test):  # something missed
                 self._print_missed(func_name)
@@ -74,34 +74,34 @@ class Benchmark:
                 exclude = [exclude]
             func_to_test = dict(
                 filter(
-                    lambda item: item[0] not in exclude, self.bench_func_dict.items()
+                    lambda item: item[0] not in exclude, self.func_dict.items()
                 )
             )
             if len(exclude) != len(func_to_test):  # something missed
                 self._print_missed(exclude)
         else:
-            func_to_test = self.bench_func_dict
+            func_to_test = self.func_dict
 
         self._run(func_to_test, num_repeats)
 
     def _print_missed(self, func_names: List[str]) -> None:
         for func in func_names:
-            if func not in self.bench_func_dict:
-                print(f"{func} is not in bench_func_dict")
+            if func not in self.func_dict:
+                print(f"{func} is not in func_dict")
 
     def _reset_results(self) -> None:
         self._results = {}  # ? if exists add new
 
     def _run(
-        self, bench_func_dict: Dict[str, Callable], num_repeats: Union[int, None] = None
+        self, func_dict: Dict[str, Callable], num_repeats: Union[int, None] = None
     ) -> None:
         self._reset_results()
-        if len(bench_func_dict) == 0:
+        if len(func_dict) == 0:
             print("Nothing to test")
         else:
             if num_repeats is None:
                 num_repeats = self.num_repeats
-            func_names = bench_func_dict.keys()
+            func_names = func_dict.keys()
             num_funcs = len(func_names)
             self._max_name_len = max(len(func_name) for func_name in func_names)
             text_color = "[green]"
@@ -136,7 +136,7 @@ class Benchmark:
     def _run_benchmark(self, func_name: str, num_repeats: int) -> List[float]:
         return self._benchmark(
             f"{func_name:{self._max_name_len}}",
-            self.bench_func_dict[func_name],
+            self.func_dict[func_name],
             num_repeats,
             self.progress_bar,
         )
@@ -144,17 +144,17 @@ class Benchmark:
     def __call__(self, num_repeats: Union[int, None] = None) -> None:
         if num_repeats is None:
             num_repeats = self.num_repeats
-        self._run(self.bench_func_dict, num_repeats)
+        self._run(self.func_dict, num_repeats)
 
     @property
     def results(self) -> Dict[str, float]:
-        if self._results is Empty:
-            return {}
-        else:
+        if self._results:
             result = {}
             for res in self._results:
                 result[res] = sum(self._results[res]) / len(self._results[res])
             return result
+        else:
+            return {}
 
     def print_results(
         self, results=None, results_header=None, sort=True, reverse=False, compare=True
@@ -192,10 +192,10 @@ class Benchmark:
             print(line)
 
     def __str__(self) -> str:
-        return ", ".join(self.bench_func_dict.keys())
+        return ", ".join(self.func_dict.keys())
 
     def __repr__(self) -> str:
-        return ", ".join(self.bench_func_dict.keys())
+        return ", ".join(self.func_dict.keys())
 
 
 class BenchmarkIter(Benchmark):
@@ -203,7 +203,7 @@ class BenchmarkIter(Benchmark):
 
     def __init__(
         self,
-        func: Union[Callable, Dict[str, Callable]],
+        func: Union[Callable, Dict[str, Callable], List[Callable]],
         item_list: List[Any],
         num_repeats: int = 5,
         clear_progress: bool = True,
@@ -228,7 +228,7 @@ class BenchmarkIter(Benchmark):
         """Return func, that run func over item_list"""
 
         def inner(self=self, func_name=func_name):
-            func = self.bench_func_dict[func_name]
+            func = self.func_dict[func_name]
             task = self.progress_bar.add_task(
                 f"iterating {func_name}", total=len(self.item_list)
             )
