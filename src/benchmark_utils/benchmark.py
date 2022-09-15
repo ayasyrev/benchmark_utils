@@ -41,7 +41,7 @@ class Benchmark:
         clear_progress: bool = True,
     ):
         self.num_repeats = num_repeats
-        self._results = None
+        self._results: Union[None, Dict[str, List[float]]] = None
         self.bench_func_dict: Dict[str, Callable]
         if isinstance(func, dict):
             self.bench_func_dict = func
@@ -54,17 +54,43 @@ class Benchmark:
         self.clear_progress = clear_progress
 
     def run(
-        self, func_name: Union[str, None] = None, num_repeats: Union[int, None] = None
+        self,
+        func_name: Union[str, None, List[str]] = None,
+        num_repeats: Union[int, None] = None,
+        exclude: Union[str, List[str], None] = None,
     ) -> None:
-        if func_name is None:
-            self._run(self.bench_func_dict, num_repeats)
+        self._results = {}
+        if func_name:
+            if isinstance(func_name, str):
+                func_name = [func_name]
+            func_to_test = dict(
+                filter(lambda item: item[0] in func_name, self.bench_func_dict.items())
+            )
+            if len(func_name) != len(func_to_test):  # something missed
+                self._print_missed(func_name)
+
+        elif exclude:
+            if isinstance(exclude, str):
+                exclude = [exclude]
+            func_to_test = dict(
+                filter(
+                    lambda item: item[0] not in exclude, self.bench_func_dict.items()
+                )
+            )
+            if len(exclude) != len(func_to_test):  # something missed
+                self._print_missed(exclude)
         else:
-            func = self.bench_func_dict.get(func_name)
-            if func is not None:  # todo - add List as input
-                bench_func_dict = {func_name: func}
-                self._run(bench_func_dict, num_repeats)
-            else:
-                print(f"Func_name {func_name} is not in bench_func_dict")
+            func_to_test = self.bench_func_dict
+
+        if len(func_to_test) == 0:
+            print("Nothing to test")
+        else:
+            self._run(func_to_test, num_repeats)
+
+    def _print_missed(self, func_names: List[str]) -> None:
+        for func in func_names:
+            if func not in self.bench_func_dict:
+                print(f"{func} is not in bench_func_dict")
 
     def _run(
         self, bench_func_dict: Dict[str, Callable], num_repeats: Union[int, None] = None
