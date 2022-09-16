@@ -70,6 +70,7 @@ def test_benchmark():
     # todo test print results
     bench.print_results()
     bench.print_results(sort=True)
+    bench.print_results(sort=False)
     bench.print_results(results={"test_func": 0.1}, results_header="test_func  | sec")
     bench.print_results(
         results={"test_func": 0.1}, results_header="test_func  | sec", compare=True

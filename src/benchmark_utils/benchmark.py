@@ -1,4 +1,3 @@
-from queue import Empty
 from timeit import timeit
 from typing import Any, Callable, Dict, List, Union
 
