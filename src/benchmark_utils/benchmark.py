@@ -131,7 +131,10 @@ class Benchmark:
                     columns[3],
                 )  # remove BarColumn and TaskProgressColumn
 
-            self.print_results()
+            self._after_run()
+
+    def _after_run(self) -> None:
+        self.print_results()
 
     def _run_benchmark(self, func_name: str, num_repeats: int) -> List[float]:
         return self._benchmark(
@@ -248,7 +251,7 @@ class BenchmarkIter(Benchmark):
 
         return inner
 
-    def print_results_per_item(self, sort=False, reverse=True, compare=False) -> None:
+    def print_results_per_item(self, sort=True, reverse=True, compare=False) -> None:
         if self.exceptions is not None:
             print(f"Got exceptions {len(self.exceptions)}!")
         num_items = len(self.item_list)
@@ -264,3 +267,6 @@ class BenchmarkIter(Benchmark):
             reverse=reverse,
             compare=compare,
         )
+
+    def _after_run(self) -> None:
+        self.print_results_per_item()
