@@ -193,11 +193,15 @@ class Benchmark:
                 line += f" {(best_res / results[func_name]) - 1:0.1%}"
             print(line)
 
-    def __str__(self) -> str:
+    @property
+    def func_names(self) -> str:
         return ", ".join(self.func_dict.keys())
 
+    def __str__(self) -> str:
+        return f"{self.__class__.__name__}({self.func_names})"
+
     def __repr__(self) -> str:
-        return ", ".join(self.func_dict.keys())
+        return f"{self.__class__.__name__}({self.func_names})"
 
 
 class BenchmarkIter(Benchmark):
@@ -252,7 +256,7 @@ class BenchmarkIter(Benchmark):
 
     def print_results_per_item(self, sort=True, reverse=True, compare=False) -> None:
         if self.exceptions is not None:
-            print(f"Got exceptions {len(self.exceptions)}!")
+            print(f"Got {len(self.exceptions)} exceptions: {', '.join(self.exceptions.keys())}.")
         num_items = len(self.item_list)
         results = self.results
         results = {
