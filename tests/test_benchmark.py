@@ -39,13 +39,13 @@ def test_benchmark():
     bench = benchmark.Benchmark({name_func: lambda: sleep(sleep_time)})
     assert bench.num_repeats == 5
     assert bench.results == {}
-    assert bench.__repr__() == name_func
-    assert repr(bench) == name_func
+    assert name_func in bench.__repr__()
+    assert name_func in repr(bench)
     # ran as __call__
     bench()
     result = bench.results[name_func]
     assert equal_near(result, sleep_time, threshold=0.5)
-    assert str(bench) == name_func
+    assert name_func in str(bench)
     assert bench._results is not None
     assert len(bench._results) == 1
     assert len(bench._results[name_func]) == 5
@@ -60,9 +60,10 @@ def test_benchmark():
     bench.run("")
     # bench one func
     bench = benchmark.Benchmark(func_to_test)
-    assert repr(bench) == "func_to_test"
+    assert "func_to_test" in repr(bench)
     bench = benchmark.Benchmark([func_to_test, func_to_test_2])
-    assert repr(bench) == "func_to_test, func_to_test_2"
+    assert "func_to_test" in repr(bench)
+    assert "func_to_test_2" in repr(bench)
     bench()
     assert bench._results is not None
     assert len(bench._results) == 2
@@ -121,8 +122,8 @@ def test_benchmark_iter():
     bench = benchmark.BenchmarkIter(
         func={name_func: func_to_test}, item_list=list_item_sleep_time
     )
-    assert bench.__repr__() == name_func
-    assert repr(bench) == name_func
+    assert name_func in bench.__repr__()
+    assert name_func in repr(bench)
     bench()
     result = bench.results[name_func]
     print(result)
@@ -145,8 +146,8 @@ def test_benchmark_iter_wrong_item():
     item_list = [True, False]
     bench = benchmark.BenchmarkIter(func=func_with_exception, item_list=item_list)
     assert bench.exceptions is None
-    assert bench.__repr__() == "func_with_exception"
-    assert repr(bench) == "func_with_exception"
+    assert "func_with_exception" in bench.__repr__()
+    assert "func_with_exception" in repr(bench)
     bench()
     assert bench.exceptions is not None
     assert len(bench.exceptions) == 1
@@ -159,8 +160,10 @@ def test_benchmark_iter_wrong_item():
         item_list=item_list,
     )
     assert bench.exceptions is None
-    assert bench.__repr__() == "func_1, func_2"
-    assert repr(bench) == "func_1, func_2"
+    assert "func_1" in bench.__repr__()
+    assert "func_2" in bench.__repr__()
+    assert "func_1" in repr(bench)
+    assert "func_2" in repr(bench)
     # run
     bench()
     assert bench._results is not None

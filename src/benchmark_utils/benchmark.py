@@ -72,9 +72,7 @@ class Benchmark:
             if isinstance(exclude, str):
                 exclude = [exclude]
             func_to_test = dict(
-                filter(
-                    lambda item: item[0] not in exclude, self.func_dict.items()
-                )
+                filter(lambda item: item[0] not in exclude, self.func_dict.items())
             )
             if len(exclude) != len(func_to_test):  # something missed
                 self._print_missed(exclude)
@@ -116,7 +114,9 @@ class Benchmark:
                 for num, func_name in enumerate(func_names):
                     self.progress_bar.tasks[
                         main_task
-                    ].description = f"{text_color}running {func_name} {num + 1}/{num_funcs}"
+                    ].description = (
+                        f"{text_color}running {func_name} {num + 1}/{num_funcs}"
+                    )
                     self._results[func_name] = self._run_benchmark(
                         func_name, num_repeats=num_repeats
                     )
@@ -151,10 +151,10 @@ class Benchmark:
     @property
     def results(self) -> Dict[str, float]:
         if self._results:
-            result = {}
-            for res in self._results:
-                result[res] = sum(self._results[res]) / len(self._results[res])
-            return result
+            return {
+                res: sum(self._results[res]) / len(self._results[res])
+                for res in self._results
+            }
         else:
             return {}
 
@@ -193,11 +193,15 @@ class Benchmark:
                 line += f" {(best_res / results[func_name]) - 1:0.1%}"
             print(line)
 
-    def __str__(self) -> str:
+    @property
+    def func_names(self) -> str:
         return ", ".join(self.func_dict.keys())
 
+    def __str__(self) -> str:
+        return f"{self.__class__.__name__}({self.func_names})"
+
     def __repr__(self) -> str:
-        return ", ".join(self.func_dict.keys())
+        return f"{self.__class__.__name__}({self.func_names})"
 
 
 class BenchmarkIter(Benchmark):
@@ -252,7 +256,7 @@ class BenchmarkIter(Benchmark):
 
     def print_results_per_item(self, sort=True, reverse=True, compare=False) -> None:
         if self.exceptions is not None:
-            print(f"Got exceptions {len(self.exceptions)}!")
+            print(f"Got {len(self.exceptions)} exceptions: {', '.join(self.exceptions.keys())}.")
         num_items = len(self.item_list)
         results = self.results
         results = {
