@@ -1,7 +1,7 @@
 import nox
 
 
-@nox.session(python="3.10")
+@nox.session(python="3.9")
 def coverage(session) -> None:
     """Upload coverage data."""
     session.install("coverage[toml]", "codecov")
