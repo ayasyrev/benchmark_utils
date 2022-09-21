@@ -62,18 +62,21 @@ class Benchmark:
         if func_name:
             if isinstance(func_name, str):
                 func_name = [func_name]
-            func_to_test = dict(
-                filter(lambda item: item[0] in func_name, self.func_dict.items())
-            )
+            func_to_test = {
+                key: self.func_dict[key]
+                for key in set(self.func_dict).intersection(func_name)
+            }
             if len(func_name) != len(func_to_test):  # something missed
                 self._print_missed(func_name)
 
         elif exclude:
             if isinstance(exclude, str):
                 exclude = [exclude]
-            func_to_test = dict(
-                filter(lambda item: item[0] not in exclude, self.func_dict.items())
-            )
+            func_to_test = {
+                key: self.func_dict[key]
+                for key in self.func_dict
+                if key not in exclude
+            }
             if len(exclude) != len(func_to_test):  # something missed
                 self._print_missed(exclude)
         else:
