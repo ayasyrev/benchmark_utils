@@ -62,22 +62,23 @@ class Benchmark:
         if func_name:
             if isinstance(func_name, str):
                 func_name = [func_name]
-            func_to_test = dict(
-                filter(lambda item: item[0] in func_name, self.func_dict.items())
-            )
+            func_to_test = [
+                key for key in set(self.func_dict).intersection(func_name)
+            ]
             if len(func_name) != len(func_to_test):  # something missed
                 self._print_missed(func_name)
 
         elif exclude:
             if isinstance(exclude, str):
                 exclude = [exclude]
-            func_to_test = dict(
-                filter(lambda item: item[0] not in exclude, self.func_dict.items())
-            )
+            func_to_test = [
+                key for key in self.func_dict
+                if key not in exclude
+            ]
             if len(exclude) != len(func_to_test):  # something missed
                 self._print_missed(exclude)
         else:
-            func_to_test = self.func_dict
+            func_to_test = list(self.func_dict)
 
         self._run(func_to_test, num_repeats)
 
@@ -90,15 +91,15 @@ class Benchmark:
         self._results = {}  # ? if exists add new
 
     def _run(
-        self, func_dict: Dict[str, Callable], num_repeats: Union[int, None] = None
+        self, func_names: List[str], num_repeats: Union[int, None] = None
     ) -> None:
         self._reset_results()
-        if len(func_dict) == 0:
+        if len(func_names) == 0:
             print("Nothing to test")
         else:
             if num_repeats is None:
                 num_repeats = self.num_repeats
-            func_names = func_dict.keys()
+            # func_names = func_dict.keys()
             num_funcs = len(func_names)
             self._max_name_len = max(len(func_name) for func_name in func_names)
             text_color = "[green]"
