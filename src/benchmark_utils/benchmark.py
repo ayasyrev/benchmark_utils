@@ -33,6 +33,7 @@ def benchmark(
 
 class Benchmark:
     """Bench func, num_repeats times"""
+
     _max_name_len: int = 0
     progress_bar: Progress
 
@@ -64,19 +65,14 @@ class Benchmark:
         if func_name:
             if isinstance(func_name, str):
                 func_name = [func_name]
-            func_to_test = [
-                key for key in set(self.func_dict).intersection(func_name)
-            ]
+            func_to_test = [key for key in set(self.func_dict).intersection(func_name)]
             if len(func_name) != len(func_to_test):  # something missed
                 self._print_missed(func_name)
 
         elif exclude:
             if isinstance(exclude, str):
                 exclude = [exclude]
-            func_to_test = [
-                key for key in self.func_dict
-                if key not in exclude
-            ]
+            func_to_test = [key for key in self.func_dict if key not in exclude]
             if len(exclude) != len(func_to_test):  # something missed
                 self._print_missed(exclude)
         else:
@@ -261,7 +257,9 @@ class BenchmarkIter(Benchmark):
 
     def print_results_per_item(self, sort=True, reverse=True, compare=False) -> None:
         if self.exceptions is not None:
-            print(f"Got {len(self.exceptions)} exceptions: {', '.join(self.exceptions.keys())}.")
+            print(
+                f"Got {len(self.exceptions)} exceptions: {', '.join(self.exceptions.keys())}."
+            )
         num_items = len(self.item_list)
         results = self.results
         results = {
