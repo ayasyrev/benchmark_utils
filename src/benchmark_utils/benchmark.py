@@ -1,7 +1,7 @@
 from timeit import timeit
 from typing import Any, Callable, Dict, List, Union
 
-from rich import print
+from rich import print  # pylint: disable=redefined-builtin
 from rich.progress import (
     Progress,
     TextColumn,
@@ -33,6 +33,8 @@ def benchmark(
 
 class Benchmark:
     """Bench func, num_repeats times"""
+    _max_name_len: int = 0
+    progress_bar: Progress
 
     def __init__(
         self,
@@ -91,7 +93,9 @@ class Benchmark:
         self._results = {}  # ? if exists add new
 
     def _run(
-        self, func_names: List[str], num_repeats: Union[int, None] = None
+        self,
+        func_names: Union[list[str], dict[str, Callable]],
+        num_repeats: Union[int, None] = None,
     ) -> None:
         self._reset_results()
         if len(func_names) == 0:
@@ -113,7 +117,7 @@ class Benchmark:
                 self.progress_bar = progress_bar
                 main_task = self.progress_bar.add_task("starting...", total=num_funcs)
                 for num, func_name in enumerate(func_names):
-                    self.progress_bar.tasks[
+                    self.progress_bar.tasks[  # pylint: disable=invalid-sequence-index
                         main_task
                     ].description = (
                         f"{text_color}running {func_name} {num + 1}/{num_funcs}"
@@ -122,7 +126,7 @@ class Benchmark:
                         func_name, num_repeats=num_repeats
                     )
                     self.progress_bar.update(main_task, advance=1)
-                self.progress_bar.tasks[
+                self.progress_bar.tasks[  # pylint: disable=invalid-sequence-index
                     main_task
                 ].description = f"{text_color}done {num_funcs} runs."
                 columns = self.progress_bar.columns
@@ -151,20 +155,20 @@ class Benchmark:
 
     @property
     def results(self) -> Dict[str, float]:
+        """Return dict w/ results"""
         if self._results:
             return {
-                res: sum(self._results[res]) / len(self._results[res])
-                for res in self._results
+                name: sum(res_list) / len(res_list)
+                for name, res_list in self._results.items()
             }
-        else:
-            return {}
+        return {}
 
     def print_results(
         self, results=None, results_header=None, sort=True, reverse=False, compare=True
     ) -> None:
         self._print_results(
             results=results,
-            results_header=None,
+            results_header=results_header,
             sort=sort,
             reverse=reverse,
             compare=compare,
@@ -186,7 +190,7 @@ class Benchmark:
         func_names = list(results.keys())
         if sort:
             func_names = sorted(results, key=results.get, reverse=reverse)  # type: ignore
-            results = {func_name: results[func_name] for func_name in func_names}
+            # results = {func_name: results[func_name] for func_name in func_names}
         best_res = results[func_names[0]]
         for func_name in func_names:
             line = f"{func_name:12}: {results[func_name]:6.2f}"
@@ -242,7 +246,7 @@ class BenchmarkIter(Benchmark):
             for item in self.item_list:
                 try:
                     func(item)
-                except Exception as excpt:
+                except Exception as excpt:  # pylint: disable=broad-except
                     if self.exceptions is None:
                         self.exceptions = {}
                     exception_info = {"exception": excpt, "item": item}
