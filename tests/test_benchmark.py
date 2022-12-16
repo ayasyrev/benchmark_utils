@@ -1,12 +1,20 @@
-from benchmark_utils import benchmark
+""" tests for benchmarks
+"""
+# pylint: disable=protected-access
+# pylint: disable=protected-access
+
 from time import sleep
+
+from benchmark_utils import benchmark
 
 
 def func_to_test(sleep_time: float = 0.1) -> None:
+    """simple 'sleep' func for test"""
     sleep(sleep_time)
 
 
 def func_to_test_2(sleep_time: float = 0.1) -> None:
+    """simple 'sleep' func for test"""
     sleep(sleep_time)
 
 
@@ -26,6 +34,7 @@ def equal_near(item_1: float, item_2: float, threshold: float = 0.1) -> bool:
 
 
 def test_equal_near():
+    """test for equal func"""
     assert equal_near(1.0, 1.0099)
     assert equal_near(1.0, 0.999)
     assert not equal_near(1.0, 1.112)
@@ -33,13 +42,13 @@ def test_equal_near():
 
 
 def test_benchmark():
+    """base tests for bench"""
     name_func = "test_func"
     sleep_time = 0.01
     # func as dict
     bench = benchmark.Benchmark({name_func: lambda: sleep(sleep_time)})
     assert bench.num_repeats == 5
     assert bench.results == {}
-    assert name_func in bench.__repr__()
     assert name_func in repr(bench)
     # ran as __call__
     bench()
@@ -101,7 +110,7 @@ def test_benchmark():
     assert "func_to_test" in bench._results
     # wrong name, nothing to test, empty _results
     bench.run(func_name="func_to_test_wrong_1")
-    assert bench._results == {}
+    assert not bench._results
     assert len(bench._results) == 0
     # wrong name in list, only one test
     bench.run(func_name=["func_to_test_wrong_2", "func_to_test_2"])
@@ -115,6 +124,7 @@ def test_benchmark():
 
 
 def test_benchmark_iter():
+    """base tests for bench iter"""
     name_func = "test_func"
     len_item_list = 3
     sleep_time = 0.01
@@ -122,7 +132,6 @@ def test_benchmark_iter():
     bench = benchmark.BenchmarkIter(
         func={name_func: func_to_test}, item_list=list_item_sleep_time
     )
-    assert name_func in bench.__repr__()
     assert name_func in repr(bench)
     bench()
     result = bench.results[name_func]
@@ -131,27 +140,29 @@ def test_benchmark_iter():
     bench.print_results_per_item()
 
 
-def func_with_exception(input: bool) -> None:
-    if input:
+def func_with_exception(in_value: bool) -> None:
+    """dummy func, return exception."""
+    if in_value:
         pass
     else:
         raise Exception("error")
 
 
-def func_dummy(input: bool) -> None:
-    pass
+def func_dummy(in_value: bool) -> None:  # pylint: disable=unused-argument
+    """dummy empty function."""
 
 
 def test_benchmark_iter_wrong_item():
+    """test bench w/ and w/o wrong item in item list"""
     item_list = [True, False]
     bench = benchmark.BenchmarkIter(func=func_with_exception, item_list=item_list)
     assert bench.exceptions is None
-    assert "func_with_exception" in bench.__repr__()
     assert "func_with_exception" in repr(bench)
     bench()
     assert bench.exceptions is not None
     assert len(bench.exceptions) == 1
     # dict of func
+    # run w/o exceptions
     bench = benchmark.BenchmarkIter(
         func={
             "func_1": func_with_exception,
@@ -160,17 +171,15 @@ def test_benchmark_iter_wrong_item():
         item_list=item_list,
     )
     assert bench.exceptions is None
-    assert "func_1" in bench.__repr__()
-    assert "func_2" in bench.__repr__()
     assert "func_1" in repr(bench)
     assert "func_2" in repr(bench)
-    # run
+    # run w/ exception
     bench()
     assert bench._results is not None
     assert bench.exceptions is not None
     assert len(bench.exceptions) == 1
     assert len(bench._results) == 2
-    # new run w/0 exceptions
+    # new run w/o exceptions
     bench.run("func_2")
     assert bench._results is not None
     assert bench.exceptions is None
