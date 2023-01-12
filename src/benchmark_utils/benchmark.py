@@ -271,7 +271,8 @@ class BenchmarkIter(Benchmark):
         num_items = self._num_samples or len(self.item_list)
         # results = self.results
         results = {
-            func_name: (1 / result * num_items) for func_name, result in self.results.items()
+            func_name: (1 / result * num_items)
+            for func_name, result in self.results.items()
         }
         results_header = " Func name  | Items/sec"
         self._print_results(
@@ -290,8 +291,7 @@ class BenchmarkIter(Benchmark):
         num_repeats: Union[int, None] = None,
         num_samples: Optional[int] = None,
     ) -> None:
-        """Run benchmark - `num_repeats` times, use `num_samples` or all items.
-        """
+        """Run benchmark - `num_repeats` times, use `num_samples` or all items."""
         self._num_samples = num_samples
         super().__call__(num_repeats)
         self._num_samples = None
