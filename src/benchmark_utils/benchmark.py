@@ -1,5 +1,5 @@
 from timeit import timeit
-from typing import Any, Callable, Dict, List, Union
+from typing import Any, Callable, Dict, List, Optional, Union
 
 from rich import print  # pylint: disable=redefined-builtin
 from rich.progress import (
@@ -15,7 +15,7 @@ def benchmark(
     name: str, func: Callable, num_repeats: int, progress_bar: Progress
 ) -> List[float]:
     """Return list of run times for func, num_repeats times"""
-    run_times = []
+    run_times: List[float] = []
     text_color = "[blue]"
     task = progress_bar.add_task(f"{text_color}{name}", total=num_repeats)
     for i in range(num_repeats):
@@ -160,7 +160,12 @@ class Benchmark:
         return {}
 
     def print_results(
-        self, results=None, results_header=None, sort=True, reverse=False, compare=True
+        self,
+        results: Optional[Dict[str, float]] = None,
+        results_header: Optional[str] = None,
+        sort: bool = True,
+        reverse: bool = False,
+        compare: bool = True,
     ) -> None:
         self._print_results(
             results=results,
@@ -172,11 +177,11 @@ class Benchmark:
 
     def _print_results(
         self,
-        results: Union[Dict[str, float], None] = None,
-        results_header=None,
-        sort=True,
-        reverse=False,
-        compare=False,
+        results: Optional[Dict[str, float]] = None,
+        results_header: Optional[str] = None,
+        sort: bool = True,
+        reverse: bool = False,
+        compare: bool = False,
     ) -> None:
         if results_header is None:
             results_header = self.results_header
@@ -207,6 +212,8 @@ class Benchmark:
 
 class BenchmarkIter(Benchmark):
     """Benchmark func over item_list"""
+
+    _num_samples: Optional[int] = None
 
     def __init__(
         self,
@@ -239,7 +246,8 @@ class BenchmarkIter(Benchmark):
             task = self.progress_bar.add_task(
                 f"iterating {func_name}", total=len(self.item_list)
             )
-            for item in self.item_list:
+            num_samples = self._num_samples or len(self.item_list)
+            for item in self.item_list[:num_samples]:
                 try:
                     func(item)
                 except Exception as excpt:  # pylint: disable=broad-except
@@ -260,10 +268,10 @@ class BenchmarkIter(Benchmark):
             print(
                 f"Got {len(self.exceptions)} exceptions: {', '.join(self.exceptions.keys())}."
             )
-        num_items = len(self.item_list)
-        results = self.results
+        num_items = self._num_samples or len(self.item_list)
+        # results = self.results
         results = {
-            func_name: (1 / results[func_name] * num_items) for func_name in results
+            func_name: (1 / result * num_items) for func_name, result in self.results.items()
         }
         results_header = " Func name  | Items/sec"
         self._print_results(
@@ -276,3 +284,14 @@ class BenchmarkIter(Benchmark):
 
     def _after_run(self) -> None:
         self.print_results_per_item()
+
+    def __call__(
+        self,
+        num_repeats: Union[int, None] = None,
+        num_samples: Optional[int] = None,
+    ) -> None:
+        """Run benchmark - `num_repeats` times, use `num_samples` or all items.
+        """
+        self._num_samples = num_samples
+        super().__call__(num_repeats)
+        self._num_samples = None
