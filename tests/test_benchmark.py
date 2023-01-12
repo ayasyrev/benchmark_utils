@@ -3,9 +3,11 @@
 # pylint: disable=protected-access
 # pylint: disable=protected-access
 
+from functools import partial
 from time import sleep
 
 from benchmark_utils import benchmark
+from benchmark_utils.benchmark import get_func_name
 
 
 def func_to_test(sleep_time: float = 0.1) -> None:
@@ -16,6 +18,16 @@ def func_to_test(sleep_time: float = 0.1) -> None:
 def func_to_test_2(sleep_time: float = 0.1) -> None:
     """simple 'sleep' func for test"""
     sleep(sleep_time)
+
+
+def test_func_name():
+    """test for get_func_name as arg"""
+    func_name = get_func_name(func_to_test)
+    assert  func_name == "func_to_test"
+    func_name = get_func_name(
+        func=partial(func_to_test, sleep_time=0.2)
+    )
+    assert func_name == "func_to_test {'sleep_time': 0.2}"
 
 
 def equal_near(item_1: float, item_2: float, threshold: float = 0.1) -> bool:

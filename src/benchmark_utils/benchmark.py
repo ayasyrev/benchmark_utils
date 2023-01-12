@@ -1,14 +1,10 @@
+from functools import partial
 from timeit import timeit
 from typing import Any, Callable, Dict, List, Optional, Union
 
 from rich import print  # pylint: disable=redefined-builtin
-from rich.progress import (
-    Progress,
-    TextColumn,
-    BarColumn,
-    TaskProgressColumn,
-    TimeRemainingColumn,
-)
+from rich.progress import (BarColumn, Progress, TaskProgressColumn, TextColumn,
+                           TimeRemainingColumn)
 
 
 def benchmark(
@@ -34,6 +30,14 @@ def benchmark(
     return run_times
 
 
+def get_func_name(func: Callable) -> str:
+    """Return name of Callable - function ot partial"""
+    if isinstance(func, partial):
+        return f"{func.func.__name__} {func.keywords}"
+    elif callable(func):
+        return func.__name__
+
+
 class Benchmark:
     """Bench func, num_repeats times"""
 
@@ -52,9 +56,9 @@ class Benchmark:
         if isinstance(func, dict):
             self.func_dict = func
         elif isinstance(func, list):
-            self.func_dict = {func_item.__name__: func_item for func_item in func}
+            self.func_dict = {get_func_name(func_item): func_item for func_item in func}
         else:
-            self.func_dict = {func.__name__: func}
+            self.func_dict = {get_func_name(func): func}
         self._benchmark = benchmark
         self.results_header = " Func name  | Sec / run"
         self.clear_progress = clear_progress
