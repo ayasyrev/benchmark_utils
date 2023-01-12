@@ -12,7 +12,10 @@ from rich.progress import (
 
 
 def benchmark(
-    name: str, func: Callable, num_repeats: int, progress_bar: Progress
+    name: str,
+    func: Callable,
+    num_repeats: int,
+    progress_bar: Progress,
 ) -> List[float]:
     """Return list of run times for func, num_repeats times"""
     run_times: List[float] = []
@@ -49,7 +52,7 @@ class Benchmark:
         if isinstance(func, dict):
             self.func_dict = func
         elif isinstance(func, list):
-            self.func_dict = {fn.__name__: fn for fn in func}
+            self.func_dict = {func_item.__name__: func_item for func_item in func}
         else:
             self.func_dict = {func.__name__: func}
         self._benchmark = benchmark
@@ -263,7 +266,12 @@ class BenchmarkIter(Benchmark):
 
         return inner
 
-    def print_results_per_item(self, sort=True, reverse=True, compare=False) -> None:
+    def print_results_per_item(
+        self,
+        sort: bool = True,
+        reverse: bool = True,
+        compare: bool = False,
+    ) -> None:
         if self.exceptions is not None:
             print(
                 f"Got {len(self.exceptions)} exceptions: {', '.join(self.exceptions.keys())}."
