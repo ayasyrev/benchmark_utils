@@ -23,11 +23,15 @@ def func_to_test_2(sleep_time: float = 0.1) -> None:
 def test_func_name():
     """test for get_func_name as arg"""
     func_name = get_func_name(func_to_test)
-    assert  func_name == "func_to_test"
+    assert func_name == "func_to_test"
     func_name = get_func_name(
         func=partial(func_to_test, sleep_time=0.2)
     )
-    assert func_name == "func_to_test {'sleep_time': 0.2}"
+    assert func_name == "func_to_test(sleep_time=0.2)"
+    func_name = get_func_name(
+        func=partial(func_to_test, 0.2)
+    )
+    assert func_name == "func_to_test(0.2)"
 
 
 def equal_near(item_1: float, item_2: float, threshold: float = 0.1) -> bool:
