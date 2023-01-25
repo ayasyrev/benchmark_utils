@@ -6,10 +6,12 @@ from rich import print  # pylint: disable=redefined-builtin
 from rich.progress import (BarColumn, Progress, TaskProgressColumn, TextColumn,
                            TimeRemainingColumn)
 
+AnyFunc = Callable[[Any], Any]
+
 
 def benchmark(
     name: str,
-    func: Callable,
+    func: AnyFunc,
     num_repeats: int,
     progress_bar: Progress,
 ) -> List[float]:
@@ -21,7 +23,7 @@ def benchmark(
         progress_bar.tasks[
             task
         ].description = f"{text_color}{name}: run {i + 1}/{num_repeats}"
-        run_times.append(timeit(func, number=1))
+        run_times.append(timeit(func, number=1))  # type: ignore
         progress_bar.update(task, advance=1)
     run_time_avg = sum(run_times) / len(run_times)
     progress_bar.tasks[
@@ -30,14 +32,14 @@ def benchmark(
     return run_times
 
 
-def get_func_name(func: Callable) -> str:
+def get_func_name(func: AnyFunc) -> str:
     """Return name of Callable - function ot partial"""
     if isinstance(func, partial):
-        args = ", ".join([str(arg) for arg in func.args] + [f"{k}={v}" for k, v in func.keywords.items()])
+        args = ", ".join(
+            [str(arg) for arg in func.args] + [f"{k}={v}" for k, v in func.keywords.items()]
+        )
         return f"{func.func.__name__}({args})"
-        # return f"{func.func.__name__} {func.keywords}"
-    elif callable(func):
-        return func.__name__
+    return func.__name__
 
 
 class Benchmark:
@@ -48,13 +50,13 @@ class Benchmark:
 
     def __init__(
         self,
-        func: Union[Callable, Dict[str, Callable], List[Callable]],
+        func: Union[AnyFunc, Dict[str, AnyFunc], List[AnyFunc]],
         num_repeats: int = 5,
         clear_progress: bool = True,
     ):
         self.num_repeats = num_repeats
         self._results: Dict[str, List[float]] = {}
-        self.func_dict: Dict[str, Callable]
+        self.func_dict: Dict[str, AnyFunc]
         if isinstance(func, dict):
             self.func_dict = func
         elif isinstance(func, list):
@@ -99,7 +101,7 @@ class Benchmark:
 
     def _run(
         self,
-        func_names: Union[list[str], dict[str, Callable]],
+        func_names: Union[list[str], dict[str, AnyFunc]],
         num_repeats: Union[int, None] = None,
     ) -> None:
         self._reset_results()
@@ -226,7 +228,7 @@ class BenchmarkIter(Benchmark):
 
     def __init__(
         self,
-        func: Union[Callable, Dict[str, Callable], List[Callable]],
+        func: Union[AnyFunc, Dict[str, AnyFunc], List[AnyFunc]],
         item_list: List[Any],
         num_repeats: int = 5,
         clear_progress: bool = True,
@@ -247,10 +249,10 @@ class BenchmarkIter(Benchmark):
         self.exceptions = None
         super()._reset_results()
 
-    def run_func_iter(self, func_name: str) -> Callable:
+    def run_func_iter(self, func_name: str) -> AnyFunc:
         """Return func, that run func over item_list"""
 
-        def inner(self=self, func_name=func_name):
+        def inner(self=self, func_name: str = func_name):
             func = self.func_dict[func_name]
             task = self.progress_bar.add_task(
                 f"iterating {func_name}", total=len(self.item_list)
