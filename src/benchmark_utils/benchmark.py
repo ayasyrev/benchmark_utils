@@ -33,7 +33,9 @@ def benchmark(
 def get_func_name(func: Callable) -> str:
     """Return name of Callable - function ot partial"""
     if isinstance(func, partial):
-        return f"{func.func.__name__} {func.keywords}"
+        args = ", ".join([str(arg) for arg in func.args] + [f"{k}={v}" for k, v in func.keywords.items()])
+        return f"{func.func.__name__}({args})"
+        # return f"{func.func.__name__} {func.keywords}"
     elif callable(func):
         return func.__name__
 
