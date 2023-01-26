@@ -11,7 +11,7 @@ from rich.progress import (
     TimeRemainingColumn,
 )
 
-AnyFunc = Callable[[Any], Any]
+AnyFunc = Union[Callable[[Any | None], Any | None], partial[Any]]
 
 
 def benchmark(
@@ -41,8 +41,8 @@ def get_func_name(func: AnyFunc) -> str:
     """Return name of Callable - function ot partial"""
     if isinstance(func, partial):
         args = ", ".join(
-            [str(arg) for arg in func.args]
-            + [f"{k}={v}" for k, v in func.keywords.items()]
+            [str(arg) for arg in func.args] +
+            [f"{k}={v}" for k, v in func.keywords.items()]
         )
         return f"{func.func.__name__}({args})"
     return func.__name__
@@ -82,7 +82,7 @@ class Benchmark:
         if func_name:
             if isinstance(func_name, str):
                 func_name = [func_name]
-            func_to_test = [key for key in set(self.func_dict).intersection(func_name)]
+            func_to_test = list(set(self.func_dict).intersection(func_name))
             if len(func_name) != len(func_to_test):  # something missed
                 self._print_missed(func_name)
 
@@ -178,14 +178,13 @@ class Benchmark:
 
     def print_results(
         self,
-        results: Optional[Dict[str, float]] = None,
         results_header: Optional[str] = None,
         sort: bool = True,
         reverse: bool = False,
         compare: bool = True,
     ) -> None:
         self._print_results(
-            results=results,
+            results=None,
             results_header=results_header,
             sort=sort,
             reverse=reverse,
@@ -204,11 +203,9 @@ class Benchmark:
             results_header = self.results_header
         if results is None:
             results = self.results
-        print(results_header)
-        func_names = list(results.keys())
+        func_names: list[str] = list(results.keys())
         if sort:
-            func_names = sorted(results, key=results.get, reverse=reverse)  # type: ignore
-            # results = {func_name: results[func_name] for func_name in func_names}
+            func_names = sorted(func_names, key=results.get, reverse=reverse)  # type: ignore
         best_res = results[func_names[0]]
         for func_name in func_names:
             line = f"{func_name:12}: {results[func_name]:6.2f}"

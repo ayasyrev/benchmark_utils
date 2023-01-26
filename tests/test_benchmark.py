@@ -97,10 +97,10 @@ def test_benchmark():
     bench.print_results()
     bench.print_results(sort=True)
     bench.print_results(sort=False)
-    bench.print_results(results={"test_func": 0.1}, results_header="test_func  | sec")
-    bench.print_results(
-        results={"test_func": 0.1}, results_header="test_func  | sec", compare=True
-    )
+    # bench.print_results(results={"test_func": 0.1}, results_header="test_func  | sec")
+    # bench.print_results(
+    #     results={"test_func": 0.1}, results_header="test_func  | sec", compare=True
+    # )
     assert len(bench.func_dict) == 2
     # run only one func
     bench.run(func_name="func_to_test")
