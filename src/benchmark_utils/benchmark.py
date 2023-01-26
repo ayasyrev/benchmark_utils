@@ -274,12 +274,11 @@ class BenchmarkIter(Benchmark):
         reverse: bool = True,
         compare: bool = False,
     ) -> None:
-        if hasattr(self, "exceptions"):
+        if self.exceptions:
             print(
                 f"Got {len(self.exceptions)} exceptions: {', '.join(self.exceptions.keys())}."
             )
         num_items = self._num_samples or len(self.item_list)
-        # results = self.results
         results = {
             func_name: (1 / result * num_items)
             for func_name, result in self.results.items()

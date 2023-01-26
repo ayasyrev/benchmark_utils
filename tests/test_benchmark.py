@@ -1,14 +1,12 @@
 """ tests for benchmarks
 """
 # pylint: disable=protected-access
-# pylint: disable=protected-access
 
 from functools import partial
 from time import sleep
 
 from benchmark_utils import benchmark
 from benchmark_utils.benchmark import get_func_name
-
 
 def func_to_test(sleep_time: float = 0.1, mult: int = 1) -> None:
     """simple 'sleep' func for test"""
@@ -147,7 +145,23 @@ def test_benchmark():
     # assert "func_to_test_2" not in bench._results
 
 
-def test_benchmark_iter():
+def test_benchmark_print(capsys):
+    """test printing from benchmark"""
+    bench = benchmark.Benchmark([
+        func_to_test,
+        func_to_test_2,
+    ])
+    bench()
+    captured = capsys.readouterr()
+    assert "func_to_test_2:   0.10" in captured.out 
+    assert "func_to_test:   0.10" in captured.out 
+    bench.print_results()
+    captured = capsys.readouterr()
+    assert "func_to_test_2:   0.10" in captured.out 
+    assert "func_to_test:   0.10" in captured.out 
+
+
+def test_benchmark_iter(capsys):
     """base tests for bench iter"""
     name_func = "test_func"
     len_item_list = 3
@@ -158,10 +172,26 @@ def test_benchmark_iter():
     )
     assert name_func in repr(bench)
     bench()
+
+    # check print. !check result.
+    captured = capsys.readouterr()
+    assert name_func in captured.out
     result = bench.results[name_func]
-    print(result)
     assert equal_near(result, sleep_time * len_item_list, threshold=0.5)
+    # check print
     bench.print_results_per_item()
+    captured = capsys.readouterr()
+    assert name_func in captured.out
+
+    # w/ exceptions
+    bench = benchmark.BenchmarkIter(
+        func={name_func: func_to_test},
+        item_list=[0.01, -1],
+    )
+    bench()
+    assert len(bench.exceptions) == 1
+    captured = capsys.readouterr()
+    assert "exceptions" in captured.out
 
 
 def func_with_exception(in_value: bool) -> None:
