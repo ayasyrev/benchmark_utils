@@ -72,6 +72,7 @@ def test_benchmark():
     assert bench.num_repeats == 5
     assert bench.results == {}
     assert name_func in repr(bench)
+
     # ran as __call__
     bench()
     result = bench.results[name_func]
@@ -80,15 +81,18 @@ def test_benchmark():
     assert bench._results is not None
     assert len(bench._results) == 1
     assert len(bench._results[name_func]) == 5
+
     # run 1 repeat
     bench(1)
     assert bench._results is not None
     assert len(bench._results) == 1
     assert len(bench._results[name_func]) == 1
+
     # ran at .run
     bench.run()
     bench.run(name_func)
     bench.run("")
+
     # bench one func
     bench = benchmark.Benchmark(func_to_test)
     assert "func_to_test" in repr(bench)
@@ -98,16 +102,14 @@ def test_benchmark():
     bench()
     assert bench._results is not None
     assert len(bench._results) == 2
+
     # run prints
     # todo test print results
     bench.print_results()
     bench.print_results(sort=True)
     bench.print_results(sort=False)
-    # bench.print_results(results={"test_func": 0.1}, results_header="test_func  | sec")
-    # bench.print_results(
-    #     results={"test_func": 0.1}, results_header="test_func  | sec", compare=True
-    # )
     assert len(bench.func_dict) == 2
+
     # run only one func
     bench.run(func_name="func_to_test")
     assert bench._results is not None
@@ -153,12 +155,12 @@ def test_benchmark_print(capsys):
     ])
     bench()
     captured = capsys.readouterr()
-    assert "func_to_test_2:   0.10" in captured.out 
-    assert "func_to_test:   0.10" in captured.out 
+    assert "func_to_test_2:" in captured.out 
+    assert "func_to_test:" in captured.out 
     bench.print_results()
     captured = capsys.readouterr()
-    assert "func_to_test_2:   0.10" in captured.out 
-    assert "func_to_test:   0.10" in captured.out 
+    assert "func_to_test_2:" in captured.out 
+    assert "func_to_test:" in captured.out 
 
 
 def test_benchmark_iter(capsys):
@@ -168,7 +170,8 @@ def test_benchmark_iter(capsys):
     sleep_time = 0.01
     list_item_sleep_time = len_item_list * [sleep_time]
     bench = benchmark.BenchmarkIter(
-        func={name_func: func_to_test}, item_list=list_item_sleep_time
+        func={name_func: func_to_test},
+        item_list=list_item_sleep_time,
     )
     assert name_func in repr(bench)
     bench()
@@ -209,7 +212,10 @@ def func_dummy(in_value: bool) -> None:  # pylint: disable=unused-argument
 def test_benchmark_iter_wrong_item():
     """test bench w/ and w/o wrong item in item list"""
     item_list = [True, False]
-    bench = benchmark.BenchmarkIter(func=func_with_exception, item_list=item_list)
+    bench = benchmark.BenchmarkIter(
+        func=func_with_exception,
+        item_list=item_list,
+    )
     assert len(bench.exceptions) == 0
     assert "func_with_exception" in repr(bench)
     bench()

@@ -253,10 +253,10 @@ class BenchmarkIter(Benchmark):
 
         def inner(self=self, func_name: str = func_name):
             func = self.func_dict[func_name]
-            task = self.progress_bar.add_task(
-                f"iterating {func_name}", total=len(self.item_list)
-            )
             num_samples = self._num_samples or len(self.item_list)
+            task = self.progress_bar.add_task(
+                f"iterating {func_name}", total=num_samples
+            )
             for item in self.item_list[:num_samples]:
                 try:
                     func(item)
@@ -303,4 +303,19 @@ class BenchmarkIter(Benchmark):
         """Run benchmark - `num_repeats` times, use `num_samples` or all items."""
         self._num_samples = num_samples
         super().__call__(num_repeats)
+        self._num_samples = None
+
+    def run(
+        self,
+        func_name: Union[str, None, List[str]] = None,
+        exclude: Union[str, List[str], None] = None,
+        num_repeats: Union[int, None] = None,
+        num_samples: Optional[int] = None,
+    ) -> None:
+        self._num_samples = num_samples
+        super().run(
+            func_name=func_name,
+            exclude=exclude,
+            num_repeats=num_repeats,
+        )
         self._num_samples = None
