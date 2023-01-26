@@ -180,11 +180,11 @@ def test_benchmark_iter_wrong_item():
     """test bench w/ and w/o wrong item in item list"""
     item_list = [True, False]
     bench = benchmark.BenchmarkIter(func=func_with_exception, item_list=item_list)
-    assert bench.exceptions is None
+    assert len(bench.exceptions) == 0
     assert "func_with_exception" in repr(bench)
     bench()
-    assert bench.exceptions is not None
     assert len(bench.exceptions) == 1
+
     # dict of func
     # run w/o exceptions
     bench = benchmark.BenchmarkIter(
@@ -192,19 +192,27 @@ def test_benchmark_iter_wrong_item():
             "func_1": func_with_exception,
             "func_2": func_dummy,
         },
-        item_list=item_list,
+        item_list=[True, True],
     )
-    assert bench.exceptions is None
     assert "func_1" in repr(bench)
     assert "func_2" in repr(bench)
-    # run w/ exception
     bench()
-    assert bench._results is not None
-    assert bench.exceptions is not None
+    assert len(bench.exceptions) == 0
+
+    # run w/ exception
+    bench = benchmark.BenchmarkIter(
+        func={
+            "func_1": func_with_exception,
+            "func_2": func_dummy,
+        },
+        item_list=item_list,
+    )
+    bench()
     assert len(bench.exceptions) == 1
     assert len(bench._results) == 2
-    # new run w/o exceptions
+
+    # # new run w/o exceptions
     bench.run("func_2")
     assert bench._results is not None
-    assert bench.exceptions is None
+    assert len(bench.exceptions) == 0
     assert len(bench._results) == 1

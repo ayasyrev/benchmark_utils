@@ -1,15 +1,11 @@
+from collections import defaultdict
 from functools import partial
 from timeit import timeit
 from typing import Any, Callable, Dict, List, Optional, Union
 
 from rich import print  # pylint: disable=redefined-builtin
-from rich.progress import (
-    BarColumn,
-    Progress,
-    TaskProgressColumn,
-    TextColumn,
-    TimeRemainingColumn,
-)
+from rich.progress import (BarColumn, Progress, TaskProgressColumn, TextColumn,
+                           TimeRemainingColumn)
 
 AnyFunc = Union[Callable[[Any | None], Any | None], partial[Any]]
 
@@ -238,7 +234,7 @@ class BenchmarkIter(Benchmark):
     ):
         super().__init__(func, num_repeats=num_repeats, clear_progress=clear_progress)
         self.item_list = item_list
-        self.exceptions: Union[Dict[str, List[Dict[str, Any]]], None] = None
+        self.exceptions: Dict[str, List[Dict[str, Any]]] = defaultdict(list)
 
     def _run_benchmark(self, func_name: str, num_repeats: int) -> List[float]:
         return self._benchmark(
@@ -249,7 +245,7 @@ class BenchmarkIter(Benchmark):
         )
 
     def _reset_results(self) -> None:
-        self.exceptions = None
+        self.exceptions = defaultdict(list)
         super()._reset_results()
 
     def run_func_iter(self, func_name: str) -> AnyFunc:
@@ -265,13 +261,8 @@ class BenchmarkIter(Benchmark):
                 try:
                     func(item)
                 except Exception as excpt:  # pylint: disable=broad-except
-                    if self.exceptions is None:
-                        self.exceptions = {}
                     exception_info = {"exception": excpt, "item": item}
-                    if func_name in self.exceptions.keys():
-                        self.exceptions[func_name].append(exception_info)
-                    else:
-                        self.exceptions[func_name] = [exception_info]
+                    self.exceptions[func_name].append(exception_info)
                 self.progress_bar.update(task, advance=1)
             self.progress_bar.tasks[task].visible = False
 
@@ -283,7 +274,7 @@ class BenchmarkIter(Benchmark):
         reverse: bool = True,
         compare: bool = False,
     ) -> None:
-        if self.exceptions is not None:
+        if hasattr(self, "exceptions"):
             print(
                 f"Got {len(self.exceptions)} exceptions: {', '.join(self.exceptions.keys())}."
             )
