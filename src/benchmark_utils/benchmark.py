@@ -12,7 +12,8 @@ from rich.progress import (
     TimeRemainingColumn,
 )
 
-AnyFunc = Union[Callable[[Union[Any, None]], Union[Any, None]], partial[Any]]
+AnyFunc = Callable[[Union[Any, None]], Union[Any, None]]
+# AnyFunc = Union[Callable[[Union[Any, None]], Union[Any, None]], partial[Any]]  # not works python 3.8
 
 
 def benchmark(
@@ -107,7 +108,7 @@ class Benchmark:
 
     def _run(
         self,
-        func_names: Union[list[str], dict[str, AnyFunc]],
+        func_names: Union[List[str], Dict[str, AnyFunc]],
         num_repeats: Union[int, None] = None,
     ) -> None:
         self._reset_results()
