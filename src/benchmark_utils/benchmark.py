@@ -4,8 +4,13 @@ from timeit import timeit
 from typing import Any, Callable, Dict, List, Optional, Union
 
 from rich import print  # pylint: disable=redefined-builtin
-from rich.progress import (BarColumn, Progress, TaskProgressColumn, TextColumn,
-                           TimeRemainingColumn)
+from rich.progress import (
+    BarColumn,
+    Progress,
+    TaskProgressColumn,
+    TextColumn,
+    TimeRemainingColumn,
+)
 
 AnyFunc = Union[Callable[[Any | None], Any | None], partial[Any]]
 
@@ -37,8 +42,8 @@ def get_func_name(func: AnyFunc) -> str:
     """Return name of Callable - function ot partial"""
     if isinstance(func, partial):
         args = ", ".join(
-            [str(arg) for arg in func.args] +
-            [f"{k}={v}" for k, v in func.keywords.items()]
+            [str(arg) for arg in func.args]
+            + [f"{k}={v}" for k, v in func.keywords.items()]
         )
         return f"{func.func.__name__}({args})"
     return func.__name__
