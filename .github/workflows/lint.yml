@@ -1,7 +1,7 @@
-name: Coverage
+name: Tests
 on: push
 jobs:
-  coverage:
+  tests:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
@@ -10,6 +10,4 @@ jobs:
         python-version: "3.10"
         architecture: x64
     - run: pip install nox
-    - run: nox -f noxfile_cov.py -p "3.10"
-      env:
-        CODECOV_TOKEN: ${{secrets.CODECOV_TOKEN}}
+    - run: nox -p "3.10" -f noxfile_lint.py
