@@ -12,7 +12,7 @@ from rich.progress import (
     TimeRemainingColumn,
 )
 
-AnyFunc = Union[Callable[[Any | None], Any | None], partial[Any]]
+AnyFunc = Union[Callable[[Union[Any, None]], Union[Any, None]], partial[Any]]
 
 
 def benchmark(
@@ -42,8 +42,7 @@ def get_func_name(func: AnyFunc) -> str:
     """Return name of Callable - function ot partial"""
     if isinstance(func, partial):
         args = ", ".join(
-            [str(arg) for arg in func.args]
-            + [f"{k}={v}" for k, v in func.keywords.items()]
+            [str(arg) for arg in func.args] + [f"{k}={v}" for k, v in func.keywords.items()]
         )
         return f"{func.func.__name__}({args})"
     return func.__name__
