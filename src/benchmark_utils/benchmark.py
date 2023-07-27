@@ -1,3 +1,5 @@
+"""Wrapper over timeit to easy benchmark.
+"""
 from collections import defaultdict
 from functools import partial
 from timeit import timeit
@@ -13,7 +15,6 @@ from rich.progress import (
 )
 
 AnyFunc = Callable[[Union[Any, None]], Union[Any, None]]
-# AnyFunc = Union[Callable[[Union[Any, None]], Union[Any, None]], partial[Any]]  # not works python 3.8
 
 
 def benchmark(
@@ -43,14 +44,16 @@ def get_func_name(func: AnyFunc) -> str:
     """Return name of Callable - function ot partial"""
     if isinstance(func, partial):
         args = ", ".join(
-            [str(arg) for arg in func.args] + [f"{k}={v}" for k, v in func.keywords.items()]
+            [str(arg) for arg in func.args] + [
+                f"{k}={v}" for k, v in func.keywords.items()
+            ]
         )
         return f"{func.func.__name__}({args})"
     return func.__name__
 
 
 class Benchmark:
-    """Bench func, num_repeats times"""
+    """Benchmark functions, num_repeats times"""
 
     _max_name_len: int = 0
     progress_bar: Progress
@@ -80,6 +83,7 @@ class Benchmark:
         exclude: Union[str, List[str], None] = None,
         num_repeats: Union[int, None] = None,
     ) -> None:
+        """Run benchmark, can run only ones you need, exclude that you don't need"""
         if func_name:
             if isinstance(func_name, str):
                 func_name = [func_name]
@@ -184,6 +188,7 @@ class Benchmark:
         reverse: bool = False,
         compare: bool = True,
     ) -> None:
+        """Print results of benchmark"""
         self._print_results(
             results=None,
             results_header=results_header,
@@ -216,6 +221,7 @@ class Benchmark:
 
     @property
     def func_names(self) -> str:
+        """Return func names as string"""
         return ", ".join(self.func_dict.keys())
 
     def __str__(self) -> str:
@@ -279,6 +285,7 @@ class BenchmarkIter(Benchmark):
         reverse: bool = True,
         compare: bool = False,
     ) -> None:
+        """Print results per item, you can compare and sort them"""
         if self.exceptions:
             print(
                 f"Got {len(self.exceptions)} exceptions: {', '.join(self.exceptions.keys())}."
