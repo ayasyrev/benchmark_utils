@@ -208,6 +208,7 @@ class Benchmark:
     ) -> None:
         if results_header is None:
             results_header = self.results_header
+        rprint(results_header)
         if results is None:
             results = self.results
         func_names: list[str] = list(results.keys())
