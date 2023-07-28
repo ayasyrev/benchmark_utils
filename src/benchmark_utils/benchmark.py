@@ -1,9 +1,11 @@
+"""Wrapper over timeit to easy benchmark.
+"""
 from collections import defaultdict
 from functools import partial
 from timeit import timeit
 from typing import Any, Callable, Dict, List, Optional, Union
 
-from rich import print  # pylint: disable=redefined-builtin
+from rich import print as rprint
 from rich.progress import (
     BarColumn,
     Progress,
@@ -13,7 +15,6 @@ from rich.progress import (
 )
 
 AnyFunc = Callable[[Union[Any, None]], Union[Any, None]]
-# AnyFunc = Union[Callable[[Union[Any, None]], Union[Any, None]], partial[Any]]  # not works python 3.8
 
 
 def benchmark(
@@ -43,17 +44,21 @@ def get_func_name(func: AnyFunc) -> str:
     """Return name of Callable - function ot partial"""
     if isinstance(func, partial):
         args = ", ".join(
-            [str(arg) for arg in func.args] + [f"{k}={v}" for k, v in func.keywords.items()]
+            [str(arg) for arg in func.args] + [
+                f"{k}={v}" for k, v in func.keywords.items()
+            ]
         )
         return f"{func.func.__name__}({args})"
     return func.__name__
 
 
 class Benchmark:
-    """Bench func, num_repeats times"""
+    """Benchmark functions, num_repeats times"""
 
     _max_name_len: int = 0
     progress_bar: Progress
+    _results: Dict[str, List[float]]
+    func_dict: Dict[str, AnyFunc]
 
     def __init__(
         self,
@@ -62,8 +67,6 @@ class Benchmark:
         clear_progress: bool = True,
     ):
         self.num_repeats = num_repeats
-        self._results: Dict[str, List[float]] = {}
-        self.func_dict: Dict[str, AnyFunc]
         if isinstance(func, dict):
             self.func_dict = func
         elif isinstance(func, list):
@@ -73,6 +76,7 @@ class Benchmark:
         self._benchmark = benchmark
         self.results_header = " Func name  | Sec / run"
         self.clear_progress = clear_progress
+        self._reset_results()
 
     def run(
         self,
@@ -80,6 +84,7 @@ class Benchmark:
         exclude: Union[str, List[str], None] = None,
         num_repeats: Union[int, None] = None,
     ) -> None:
+        """Run benchmark, can run only ones you need, exclude that you don't need"""
         if func_name:
             if isinstance(func_name, str):
                 func_name = [func_name]
@@ -101,7 +106,7 @@ class Benchmark:
     def _print_missed(self, func_names: List[str]) -> None:
         for func in func_names:
             if func not in self.func_dict:
-                print(f"{func} is not in func_dict")
+                rprint(f"{func} is not in func_dict")
 
     def _reset_results(self) -> None:
         self._results = {}  # ? if exists add new
@@ -113,7 +118,7 @@ class Benchmark:
     ) -> None:
         self._reset_results()
         if len(func_names) == 0:
-            print("Nothing to test")
+            rprint("Nothing to test")
         else:
             if num_repeats is None:
                 num_repeats = self.num_repeats
@@ -184,6 +189,7 @@ class Benchmark:
         reverse: bool = False,
         compare: bool = True,
     ) -> None:
+        """Print results of benchmark"""
         self._print_results(
             results=None,
             results_header=results_header,
@@ -202,6 +208,7 @@ class Benchmark:
     ) -> None:
         if results_header is None:
             results_header = self.results_header
+        rprint(results_header)
         if results is None:
             results = self.results
         func_names: list[str] = list(results.keys())
@@ -212,10 +219,11 @@ class Benchmark:
             line = f"{func_name:12}: {results[func_name]:6.2f}"
             if compare:
                 line += f" {(best_res / results[func_name]) - 1:0.1%}"
-            print(line)
+            rprint(line)
 
     @property
     def func_names(self) -> str:
+        """Return func names as string"""
         return ", ".join(self.func_dict.keys())
 
     def __str__(self) -> str:
@@ -279,8 +287,9 @@ class BenchmarkIter(Benchmark):
         reverse: bool = True,
         compare: bool = False,
     ) -> None:
+        """Print results per item, you can compare and sort them"""
         if self.exceptions:
-            print(
+            rprint(
                 f"Got {len(self.exceptions)} exceptions: {', '.join(self.exceptions.keys())}."
             )
         num_items = self._num_samples or len(self.item_list)

@@ -5,11 +5,13 @@
 from functools import partial
 from time import sleep
 
+from pytest import CaptureFixture
+
 from benchmark_utils import benchmark
 from benchmark_utils.benchmark import get_func_name
 
 
-def func_to_test(sleep_time: float = 0.1, mult: int = 1) -> None:
+def func_to_test_1(sleep_time: float = 0.1, mult: int = 1) -> None:
     """simple 'sleep' func for test"""
     sleep(sleep_time * mult)
 
@@ -21,16 +23,16 @@ def func_to_test_2(sleep_time: float = 0.1, mult: int = 1) -> None:
 
 def test_func_name():
     """test for get_func_name as arg"""
-    func_name = get_func_name(func_to_test)
-    assert func_name == "func_to_test"
-    func_name = get_func_name(func=partial(func_to_test, sleep_time=0.2))
-    assert func_name == "func_to_test(sleep_time=0.2)"
-    func_name = get_func_name(func=partial(func_to_test, 0.2))
-    assert func_name == "func_to_test(0.2)"
-    func_name = get_func_name(func=partial(func_to_test, 0.2, 2))
-    assert func_name == "func_to_test(0.2, 2)"
-    func_name = get_func_name(func=partial(func_to_test, 0.2, mult=2))
-    assert func_name == "func_to_test(0.2, mult=2)"
+    func_name = get_func_name(func_to_test_1)
+    assert func_name == "func_to_test_1"
+    func_name = get_func_name(func=partial(func_to_test_1, sleep_time=0.2))
+    assert func_name == "func_to_test_1(sleep_time=0.2)"
+    func_name = get_func_name(func=partial(func_to_test_1, 0.2))
+    assert func_name == "func_to_test_1(0.2)"
+    func_name = get_func_name(func=partial(func_to_test_1, 0.2, 2))
+    assert func_name == "func_to_test_1(0.2, 2)"
+    func_name = get_func_name(func=partial(func_to_test_1, 0.2, mult=2))
+    assert func_name == "func_to_test_1(0.2, mult=2)"
 
 
 def equal_near(item_1: float, item_2: float, threshold: float = 0.1) -> bool:
@@ -58,7 +60,7 @@ def test_equal_near():
 
 def test_benchmark():
     """base tests for bench"""
-    name_func = "test_func"
+    name_func = "test_func_1"
     sleep_time = 0.01
     # func as dict
     bench = benchmark.Benchmark({name_func: lambda: sleep(sleep_time)})
@@ -87,44 +89,37 @@ def test_benchmark():
     bench.run("")
 
     # bench one func
-    bench = benchmark.Benchmark(func_to_test)
-    assert "func_to_test" in repr(bench)
-    bench = benchmark.Benchmark([func_to_test, func_to_test_2])
-    assert "func_to_test" in repr(bench)
+    bench = benchmark.Benchmark(func_to_test_1)
+    assert "func_to_test_1" in repr(bench)
+    bench = benchmark.Benchmark([func_to_test_1, func_to_test_2])
+    assert "func_to_test_1" in repr(bench)
     assert "func_to_test_2" in repr(bench)
     bench()
     assert bench._results is not None
     assert len(bench._results) == 2
 
-    # run prints
-    # todo test print results
-    bench.print_results()
-    bench.print_results(sort=True)
-    bench.print_results(sort=False)
-    assert len(bench.func_dict) == 2
-
     # run only one func
-    bench.run(func_name="func_to_test")
+    bench.run(func_name="func_to_test_1")
     assert bench._results is not None
     assert len(bench._results) == 1
     assert len(bench.func_dict) == 2
-    assert "func_to_test" in bench._results
+    assert "func_to_test_1" in bench._results
     # exclude one
-    bench.run(exclude="func_to_test")
+    bench.run(exclude="func_to_test_1")
     assert bench._results is not None
     assert len(bench._results) == 1
-    assert "func_to_test" not in bench._results
+    assert "func_to_test_1" not in bench._results
     # exclude one as list of func
     bench.run(exclude=["func_to_test_2"])
     assert bench._results is not None
     assert len(bench._results) == 1
     assert "func_to_test_2" not in bench._results
     # run only one func, as list of funcs
-    bench.run(func_name=["func_to_test"])
+    bench.run(func_name=["func_to_test_1"])
     assert bench._results is not None
     assert len(bench._results) == 1
     assert len(bench.func_dict) == 2
-    assert "func_to_test" in bench._results
+    assert "func_to_test_1" in bench._results
     # wrong name, nothing to test, empty _results
     bench.run(func_name="func_to_test_wrong_1")
     assert not bench._results
@@ -137,35 +132,61 @@ def test_benchmark():
     bench.run(exclude=["func_to_test_wrong_3"])
     assert bench._results is not None
     assert len(bench._results) == 2
-    # assert "func_to_test_2" not in bench._results
 
 
-def test_benchmark_print(capsys):
+def test_benchmark_print(capsys: CaptureFixture[str]):
     """test printing from benchmark"""
     bench = benchmark.Benchmark(
         [
-            func_to_test,
-            func_to_test_2,
+            func_to_test_1,
+            partial(func_to_test_2, 0.12),
+            partial(func_to_test_1, sleep_time=0.11),
         ]
     )
     bench()
     captured = capsys.readouterr()
-    assert "func_to_test_2:" in captured.out
-    assert "func_to_test:" in captured.out
+    assert "func_to_test_2(0.12)" in captured.out
+    assert "func_to_test_1:" in captured.out
     bench.print_results()
     captured = capsys.readouterr()
-    assert "func_to_test_2:" in captured.out
-    assert "func_to_test:" in captured.out
+    out = captured.out
+    assert "func_to_test_2(0.12)" in out
+    assert "func_to_test_1:" in out
+    out_splitted = out.split("\n")
+    assert len(out_splitted) == 5
+    assert out_splitted[1].startswith("func_to_test_1")
+    assert out_splitted[2].startswith("func_to_test_1(sleep_time=0.11)")
+    assert out_splitted[3].startswith("func_to_test_2(0.12)")
+
+    # not sorted
+    bench.print_results(sort=False)
+    out_splitted = capsys.readouterr().out.split("\n")
+    assert len(out_splitted) == 5
+    assert out_splitted[1].startswith("func_to_test_1")
+    assert out_splitted[2].startswith("func_to_test_2(0.12)")
+    assert out_splitted[3].startswith("func_to_test_1(sleep_time=0.11)")
+
+    # reversed
+    bench.print_results(reverse=True)
+    out_splitted = capsys.readouterr().out.split("\n")
+    assert out_splitted[1].startswith("func_to_test_2(0.12)")
+    assert out_splitted[2].startswith("func_to_test_1(sleep_time=0.11)")
+    assert out_splitted[3].startswith("func_to_test_1")
+
+    # no compare
+    bench.print_results(compare=False)
+    out = capsys.readouterr().out
+    assert "%" not in out
 
 
-def test_benchmark_iter(capsys):
+def test_benchmark_iter(capsys: CaptureFixture[str]):
     """base tests for bench iter"""
     name_func = "test_func"
     len_item_list = 3
     sleep_time = 0.01
     list_item_sleep_time = len_item_list * [sleep_time]
     bench = benchmark.BenchmarkIter(
-        func={name_func: func_to_test},
+        func={name_func: func_to_test_1},
         item_list=list_item_sleep_time,
     )
     assert name_func in repr(bench)
@@ -183,7 +204,7 @@ def test_benchmark_iter(capsys):
 
     # w/ exceptions
     bench = benchmark.BenchmarkIter(
-        func={name_func: func_to_test},
+        func={name_func: func_to_test_1},
         item_list=[0.01, -1],
     )
     bench()
@@ -197,7 +218,7 @@ def func_with_exception(in_value: bool) -> None:
     if in_value:
         pass
     else:
-        raise Exception("error")
+        raise ValueError("error")
 
 
 def func_dummy(in_value: bool) -> None:  # pylint: disable=unused-argument
