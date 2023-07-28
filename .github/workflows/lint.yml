@@ -1,5 +1,9 @@
-name: Tests
-on: push
+name: Lint
+on:
+  push:
+    branches:
+      - dev 
+      - main
 jobs:
   tests:
     runs-on: ubuntu-latest
