@@ -204,3 +204,7 @@ bench
 </details>
 
 
+
+When we run benchmark script in terminal, we got pretty progress thanks to rich. Lets run example_1.py from example folder:
+
+![exaple_1](images/run_example_1.gif)
