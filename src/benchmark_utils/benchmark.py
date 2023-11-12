@@ -1,7 +1,10 @@
 """Wrapper over timeit to easy benchmark.
 """
+from __future__ import annotations
+
 from collections import defaultdict
 from functools import partial
+from multiprocessing import Pool, cpu_count
 from timeit import timeit
 from typing import Any, Callable, Dict, List, Optional, Union
 
@@ -44,9 +47,8 @@ def get_func_name(func: AnyFunc) -> str:
     """Return name of Callable - function ot partial"""
     if isinstance(func, partial):
         args = ", ".join(
-            [str(arg) for arg in func.args] + [
-                f"{k}={v}" for k, v in func.keywords.items()
-            ]
+            [str(arg) for arg in func.args]
+            + [f"{k}={v}" for k, v in func.keywords.items()]
         )
         return f"{func.func.__name__}({args})"
     return func.__name__
@@ -233,10 +235,21 @@ class Benchmark:
         return f"{self.__class__.__name__}({self.func_names})"
 
 
+def try_run(func: AnyFunc, item: Any) -> str | None:
+    """Run func, return None or exception message"""
+    try:
+        func(item)
+        return None
+    except Exception as excpt:  # pylint: disable=broad-except
+        return {"exception": excpt, "item": item}
+
+
 class BenchmarkIter(Benchmark):
     """Benchmark func over item_list"""
 
     _num_samples: Optional[int] = None
+    _multiprocessing: Optional[bool] = None
+    _num_workers: Optional[int] = None
 
     def __init__(
         self,
@@ -263,21 +276,31 @@ class BenchmarkIter(Benchmark):
 
     def run_func_iter(self, func_name: str) -> AnyFunc:
         """Return func, that run func over item_list"""
+        func = self.func_dict[func_name]
 
-        def inner(self=self, func_name: str = func_name):
-            func = self.func_dict[func_name]
+        def inner():
             num_samples = self._num_samples or len(self.item_list)
             task = self.progress_bar.add_task(
                 f"iterating {func_name}", total=num_samples
             )
-            for item in self.item_list[:num_samples]:
-                try:
-                    func(item)
-                except Exception as excpt:  # pylint: disable=broad-except
-                    exception_info = {"exception": excpt, "item": item}
-                    self.exceptions[func_name].append(exception_info)
-                self.progress_bar.update(task, advance=1)
-            self.progress_bar.tasks[task].visible = False
+
+            if self._multiprocessing:
+                num_workers = self._num_workers or cpu_count()
+                with Pool(num_workers) as p:
+                    for result in p.imap(
+                        partial(try_run, func),
+                        self.item_list[:num_samples],
+                    ):
+                        if result:
+                            self.exceptions[func_name].append(result)
+                        self.progress_bar.update(task, advance=1)
+            else:
+                for item in self.item_list[:num_samples]:
+                    result = try_run(func, item)
+                    if result:
+                        self.exceptions[func_name].append(result)
+                    self.progress_bar.update(task, advance=1)
+            self.progress_bar.tasks[task].visible = False  # pylint: disable=invalid-sequence-index
 
         return inner
 
@@ -325,11 +348,17 @@ class BenchmarkIter(Benchmark):
         exclude: Union[str, List[str], None] = None,
         num_repeats: Union[int, None] = None,
         num_samples: Optional[int] = None,
+        multiprocessing: Optional[bool] = None,
+        num_workers: Optional[int] = None,
     ) -> None:
         self._num_samples = num_samples
+        self._multiprocessing = multiprocessing
+        self._num_workers = num_workers
         super().run(
             func_name=func_name,
             exclude=exclude,
             num_repeats=num_repeats,
         )
         self._num_samples = None
+        self._multiprocessing = None
+        self._num_workers = None
