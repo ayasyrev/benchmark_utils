@@ -285,7 +285,10 @@ class BenchmarkIter(Benchmark):
             )
 
             if self._multiprocessing:
-                num_workers = self._num_workers or cpu_count()
+                if self._num_workers is not None:
+                    num_workers = min(self._num_workers, cpu_count())
+                else:
+                    num_workers = cpu_count()
                 with Pool(num_workers) as p:
                     for result in p.imap(
                         partial(try_run, func),
@@ -300,7 +303,9 @@ class BenchmarkIter(Benchmark):
                     if result:
                         self.exceptions[func_name].append(result)
                     self.progress_bar.update(task, advance=1)
-            self.progress_bar.tasks[task].visible = False  # pylint: disable=invalid-sequence-index
+            self.progress_bar.tasks[
+                task
+            ].visible = False  # pylint: disable=invalid-sequence-index
 
         return inner
 
