@@ -1,8 +1,3 @@
----
-hide:
-  - navigation
----
-
 # Benchmark utils
 
 Utils for benchmark - wrapper over python timeit.
