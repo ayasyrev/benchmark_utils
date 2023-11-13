@@ -1,0 +1,7 @@
+coverage[toml]
+flake8
+black
+black[jupyter]
+isort
+mypy
+nox
