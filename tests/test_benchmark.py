@@ -1,8 +1,8 @@
 """ tests for benchmarks
 """
 # pylint: disable=protected-access
-
 from functools import partial
+from multiprocessing import cpu_count
 from time import sleep
 
 from pytest import CaptureFixture
@@ -19,6 +19,20 @@ def func_to_test_1(sleep_time: float = 0.1, mult: int = 1) -> None:
 def func_to_test_2(sleep_time: float = 0.1, mult: int = 1) -> None:
     """simple 'sleep' func for test"""
     sleep(sleep_time * mult)
+
+
+def func_to_test_3(x: int) -> None:
+    """simple 'sleep' func for test"""
+    if isinstance(x, str):
+        pass
+    sleep(0.01)
+
+
+def func_to_test_4(x: int) -> None:
+    """simple 'sleep' func for test"""
+    if isinstance(x, str):
+        pass
+    sleep(0.015)
 
 
 def test_func_name():
@@ -268,3 +282,35 @@ def test_benchmark_iter_wrong_item():
     assert bench._results is not None
     assert len(bench.exceptions) == 0
     assert len(bench._results) == 1
+
+
+def test_benchmark_iter_multiprocessing():
+    """test bench iter with multiprocessing"""
+    bench = benchmark.BenchmarkIter(
+        func=[func_to_test_3, func_to_test_4],
+        item_list=tuple(range(10)),
+    )
+    bench()
+    assert len(bench.exceptions) == 0
+    assert len(bench._results) == 2
+    res_1, res_2 = bench.results.values()
+    bench.run(multiprocessing=True)
+    assert len(bench.exceptions) == 0
+    assert len(bench._results) == 2
+    res_mult_1, res_mult_2 = bench.results.values()
+    assert res_1 / res_mult_1 > 1.05
+    assert res_2 / res_mult_2 > 1.05
+    bench.run(multiprocessing=True, num_workers=2)
+    assert len(bench.exceptions) == 0
+    assert len(bench._results) == 2
+    res_mult_1, res_mult_2 = bench.results.values()
+    assert res_1 / res_mult_1 > 1.05
+    assert res_2 / res_mult_2 > 1.05
+
+    num_cpu = cpu_count()
+    bench.run(multiprocessing=True, num_workers=num_cpu + 1)
+    assert len(bench.exceptions) == 0
+    assert len(bench._results) == 2
+    res_mult_1, res_mult_2 = bench.results.values()
+    assert res_1 / res_mult_1 > 1.05
+    assert res_2 / res_mult_2 > 1.05
