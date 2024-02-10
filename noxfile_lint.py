@@ -1,6 +1,5 @@
 import nox
 
-
 locations = "src/benchmark_utils", "tests", "noxfile.py"
 
 
