@@ -236,7 +236,7 @@ class Benchmark:
         return f"{self.__class__.__name__}({self.func_names})"
 
 
-def try_run(func: AnyFunc, item: Any) -> str | None:
+def try_run(func: AnyFunc, item: Any) -> dict[str, Any] | None:
     """Run func, return None or exception message"""
     try:
         func(item)
@@ -275,7 +275,7 @@ class BenchmarkIter(Benchmark):
         self.exceptions = defaultdict(list)
         super()._reset_results()
 
-    def run_func_iter(self, func_name: str) -> AnyFunc:
+    def run_func_iter(self, func_name: str) -> Callable[[], None]:
         """Return func, that run func over item_list"""
         func = self.func_dict[func_name]
 
@@ -304,8 +304,8 @@ class BenchmarkIter(Benchmark):
                     if result:
                         self.exceptions[func_name].append(result)
                     self.progress_bar.update(task, advance=1)
-            self.progress_bar.tasks[task].visible = (
-                False  # pylint: disable=invalid-sequence-index
+            self.progress_bar.tasks[task].visible = (  # pylint: disable=invalid-sequence-index
+                False
             )
 
         return inner
