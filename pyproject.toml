@@ -54,9 +54,6 @@ target-version = "py38"
 [tool.ruff.lint]
 explicit-preview-rules = true
 
-[tool.ruff.per-file-ignores]
-"__init__.py" = ["F401"]
-
 [tool.ruff.format]
 # Like Black, use double quotes for strings.
 quote-style = "double"

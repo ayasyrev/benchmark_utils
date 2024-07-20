@@ -1,8 +1,10 @@
-pre-commit
-# nbmetaclean
 black
 black[jupyter]
+coverage[toml]
 flake8
-mypy
 isort
+mypy
+nbmetaclean
+nox
+pre-commit
 ruff
