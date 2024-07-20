@@ -9,14 +9,14 @@ hide:
 Utils for benchmark - wrapper over python timeit.
 <!-- cell -->
 [![PyPI - Python Version](https://img.shields.io/pypi/pyversions/benchmark-utils)](https://pypi.org/project/benchmark-utils/)
-[![PyPI Status](https://badge.fury.io/py/benchmark-utils.svg)](https://badge.fury.io/py/benchmark-utils)  
+[![PyPI Status](https://badge.fury.io/py/benchmark-utils.svg)](https://badge.fury.io/py/benchmark-utils)
 [![Tests](https://github.com/ayasyrev/benchmark_utils/workflows/Tests/badge.svg)](https://github.com/ayasyrev/benchmark_utils/actions?workflow=Tests)  [![Codecov](https://codecov.io/gh/ayasyrev/benchmark_utils/branch/main/graph/badge.svg)](https://codecov.io/gh/ayasyrev/benchmark_utils)
 <!-- cell -->
 Tested on python 3.8 - 3.12
 <!-- cell -->
 ## Install
 <!-- cell -->
-Install from pypi:  
+Install from pypi:
 
 `pip install benchmark_utils`
 
@@ -28,7 +28,7 @@ Or install from github repo:
 <!-- cell -->
 Lets benchmark some (dummy) functions.
 <!-- cell -->
-<details open> <summary>output</summary>  
+<details open> <summary>output</summary>
 ```python
 from time import sleep
 
@@ -43,18 +43,18 @@ def func_to_test_2(sleep_time: float = 0.11, mult: int = 1) -> None:
     sleep(sleep_time * mult)</details>
 
 <!-- cell -->
-<details open> <summary>output</summary>  
+<details open> <summary>output</summary>
 
 Let's create benchmark.</details>
 
 <!-- cell -->
-<details open> <summary>output</summary>  
+<details open> <summary>output</summary>
 ```python
 from benchmark_utils import Benchmark
 ```</details>
 
 <!-- cell -->
-<details open> <summary>output</summary>  
+<details open> <summary>output</summary>
 ```python
 bench = Benchmark(
     [func_to_test_1, func_to_test_2],
@@ -65,7 +65,7 @@ bench = Benchmark(
 ```python
 bench
 ```
-<details open> <summary>output</summary>  
+<details open> <summary>output</summary>
 
 
 
@@ -79,7 +79,7 @@ Now we can benchmark that functions.
 # we can run bench.run() or just:
 bench()
 ```
-<details open> <summary>output</summary>  
+<details open> <summary>output</summary>
 
 
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"></pre>
@@ -114,7 +114,7 @@ We can run it again, all functions, some of it, exclude some and change number o
 ```python
 bench.run(num_repeats=10)
 ```
-<details open> <summary>output</summary>  
+<details open> <summary>output</summary>
 
 
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"></pre>
@@ -149,7 +149,7 @@ After run, we can print results - sorted or not, reversed, compare results with 
 ```python
 bench.print_results(reverse=True)
 ```
-<details open> <summary>output</summary>  
+<details open> <summary>output</summary>
 
 
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"> Func name  | Sec <span style="color: #800080; text-decoration-color: #800080">/</span> run
@@ -170,7 +170,7 @@ bench.print_results(reverse=True)
 <!-- cell -->
 We can add functions to benchmark as list of functions (or partial) or as dictionary: `{"name": function}`.
 <!-- cell -->
-<details open> <summary>output</summary>  
+<details open> <summary>output</summary>
 ```python
 bench = Benchmark(
     [
@@ -185,7 +185,7 @@ bench = Benchmark(
 ```python
 bench
 ```
-<details open> <summary>output</summary>  
+<details open> <summary>output</summary>
 
 
 
@@ -196,7 +196,7 @@ bench
 ```python
 bench.run()
 ```
-<details open> <summary>output</summary>  
+<details open> <summary>output</summary>
 
 
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"></pre>
@@ -232,7 +232,7 @@ bench.run()
 </pre></details>
 
 <!-- cell -->
-<details open> <summary>output</summary>  
+<details open> <summary>output</summary>
 ```python
 bench = Benchmark(
     {
@@ -246,7 +246,7 @@ bench = Benchmark(
 ```python
 bench
 ```
-<details open> <summary>output</summary>  
+<details open> <summary>output</summary>
 
 
 
@@ -262,7 +262,7 @@ When we run benchmark script in terminal, we got pretty progress thanks to rich.
 <!-- cell -->
 With BenchmarkIter we can benchmark functions over iterables, for example read list of files or run functions with different arguments.
 <!-- cell -->
-<details open> <summary>output</summary>  
+<details open> <summary>output</summary>
 ```python
 def func_to_test_1(x: int) -> None:
     """simple 'sleep' func for test"""
@@ -278,7 +278,7 @@ dummy_params = list(range(10))
 ```</details>
 
 <!-- cell -->
-<details open> <summary>output</summary>  
+<details open> <summary>output</summary>
 ```python
 from benchmark_utils import BenchmarkIter
 
@@ -292,7 +292,7 @@ bench = BenchmarkIter(
 ```python
 bench()
 ```
-<details open> <summary>output</summary>  
+<details open> <summary>output</summary>
 
 
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"></pre>
@@ -328,7 +328,7 @@ And we can limit number of items with `num_samples` argument:
 <!-- cell -->
 ## Multiprocessing
 <!-- cell -->
-By default we tun functions in one thread.  
+By default we tun functions in one thread.
 But we can use multiprocessing with `multiprocessing=True` argument:
 `bench.run(multiprocessing=True)`
 It will use all available cpu cores.
@@ -338,7 +338,7 @@ And we can use `num_workers` argument to limit used cpu cores:
 ```python
 bench.run(multiprocessing=True, num_workers=2)
 ```
-<details open> <summary>output</summary>  
+<details open> <summary>output</summary>
 
 
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"></pre>
