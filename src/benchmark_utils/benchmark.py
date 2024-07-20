@@ -1,5 +1,6 @@
 """Wrapper over timeit to easy benchmark.
 """
+
 from __future__ import annotations
 
 from collections import defaultdict
@@ -31,15 +32,15 @@ def benchmark(
     text_color = "[blue]"
     task = progress_bar.add_task(f"{text_color}{name}", total=num_repeats)
     for i in range(num_repeats):
-        progress_bar.tasks[
-            task
-        ].description = f"{text_color}{name}: run {i + 1}/{num_repeats}"
+        progress_bar.tasks[task].description = (
+            f"{text_color}{name}: run {i + 1}/{num_repeats}"
+        )
         run_times.append(timeit(func, number=1))  # type: ignore
         progress_bar.update(task, advance=1)
     run_time_avg = sum(run_times) / len(run_times)
-    progress_bar.tasks[
-        task
-    ].description = f"{text_color}{name}: {run_time_avg:0.2f} sec/run."
+    progress_bar.tasks[task].description = (
+        f"{text_color}{name}: {run_time_avg:0.2f} sec/run."
+    )
     return run_times
 
 
@@ -235,7 +236,7 @@ class Benchmark:
         return f"{self.__class__.__name__}({self.func_names})"
 
 
-def try_run(func: AnyFunc, item: Any) -> str | None:
+def try_run(func: AnyFunc, item: Any) -> dict[str, Any] | None:
     """Run func, return None or exception message"""
     try:
         func(item)
@@ -274,7 +275,7 @@ class BenchmarkIter(Benchmark):
         self.exceptions = defaultdict(list)
         super()._reset_results()
 
-    def run_func_iter(self, func_name: str) -> AnyFunc:
+    def run_func_iter(self, func_name: str) -> Callable[[], None]:
         """Return func, that run func over item_list"""
         func = self.func_dict[func_name]
 
@@ -303,9 +304,9 @@ class BenchmarkIter(Benchmark):
                     if result:
                         self.exceptions[func_name].append(result)
                     self.progress_bar.update(task, advance=1)
-            self.progress_bar.tasks[
-                task
-            ].visible = False  # pylint: disable=invalid-sequence-index
+            self.progress_bar.tasks[task].visible = (  # pylint: disable=invalid-sequence-index
+                False
+            )
 
         return inner
 

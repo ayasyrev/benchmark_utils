@@ -1,5 +1,6 @@
 """ tests for benchmarks
 """
+
 # pylint: disable=protected-access
 from functools import partial
 from multiprocessing import cpu_count
