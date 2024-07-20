@@ -6,6 +6,7 @@ from functools import partial
 from multiprocessing import cpu_count
 from time import sleep
 
+import pytest
 from pytest import CaptureFixture
 
 from benchmark_utils import benchmark
@@ -50,29 +51,6 @@ def test_func_name():
     assert func_name == "func_to_test_1(0.2, mult=2)"
 
 
-def equal_near(item_1: float, item_2: float, threshold: float = 0.1) -> bool:
-    """Is two item close to equal?
-    Return True is difference less than threshold.
-
-    Args:
-        item_1 (float): First item.
-        item_2 (float): Second item.
-        threshold (float, optional): Threshold for compare. Defaults to 0.01.
-
-    Returns:
-        bool: Return True if difference less than threshold.
-    """
-    return abs(1 - (item_1 / item_2)) < threshold
-
-
-def test_equal_near():
-    """test for equal func"""
-    assert equal_near(1.0, 1.0099)
-    assert equal_near(1.0, 0.999)
-    assert not equal_near(1.0, 1.112)
-    assert not equal_near(1.0, 0.9)
-
-
 def test_benchmark():
     """base tests for bench"""
     name_func = "test_func_1"
@@ -86,7 +64,7 @@ def test_benchmark():
     # ran as __call__
     bench()
     result = bench.results[name_func]
-    assert equal_near(result, sleep_time, threshold=0.5)
+    assert result == pytest.approx(sleep_time, 0.01)
     assert name_func in str(bench)
     assert bench._results is not None
     assert len(bench._results) == 1
@@ -211,7 +189,7 @@ def test_benchmark_iter(capsys: CaptureFixture[str]):
     captured = capsys.readouterr()
     assert name_func in captured.out
     result = bench.results[name_func]
-    assert equal_near(result, sleep_time * len_item_list, threshold=0.5)
+    assert result == pytest.approx(sleep_time * len_item_list, 0.05)
     # check print
     bench.print_results_per_item()
     captured = capsys.readouterr()
