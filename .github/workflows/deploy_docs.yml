@@ -13,5 +13,4 @@ jobs:
           python-version: "3.12"
       - run: pip install uv
       - run: uv pip install --system mkdocs-material pymdown-extensions
-      - run: pip install pymdown-extensions
       - run: mkdocs gh-deploy --force

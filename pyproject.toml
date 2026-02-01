@@ -4,7 +4,7 @@ build-backend = "uv_build"
 
 [project]
 name = "benchmark_utils"
-version = "0.2.5_dev"
+version = "0.2.5b1"
 description = "Utils for benchmark."
 readme = "README.md"
 license = {text = "Apache-2.0"}
