@@ -10,7 +10,8 @@ jobs:
       - uses: actions/checkout@main
       - uses: actions/setup-python@main
         with:
-          python-version: 3.x
-      - run: pip install mkdocs-material
+          python-version: "3.12"
+      - run: pip install uv
+      - run: uv pip install --system mkdocs-material pymdown-extensions
       - run: pip install pymdown-extensions
       - run: mkdocs gh-deploy --force

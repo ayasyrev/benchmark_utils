@@ -1,14 +1,14 @@
 import nox
 
 
-@nox.session(python=["3.11"], venv_backend="uv")
+@nox.session(python=["3.12"], venv_backend="uv")
 def tests_cov(session):
     args = session.posargs or ["--cov"]
     session.install("-e .[test]", "coverage[toml]")
     session.run("pytest", *args)
 
 
-@nox.session(python="3.11", venv_backend="uv")
+@nox.session(python="3.12", venv_backend="uv")
 def coverage(session) -> None:
     """Upload coverage data."""
     session.install("coverage[toml]", "codecov")

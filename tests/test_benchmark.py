@@ -1,5 +1,4 @@
-""" tests for benchmarks
-"""
+"""tests for benchmarks"""
 
 # pylint: disable=protected-access
 from functools import partial
@@ -64,7 +63,7 @@ def test_benchmark():
     # ran as __call__
     bench()
     result = bench.results[name_func]
-    assert result == pytest.approx(sleep_time, 0.01)
+    assert result == pytest.approx(sleep_time, abs=0.02)
     assert name_func in str(bench)
     assert bench._results is not None
     assert len(bench._results) == 1

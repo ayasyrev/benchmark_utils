@@ -1,6 +1,55 @@
+[build-system]
+requires = ["uv-build"]
+build-backend = "uv_build"
+
+[project]
+name = "benchmark_utils"
+version = "0.2.5_dev"
+description = "Utils for benchmark."
+readme = "README.md"
+license = {text = "Apache-2.0"}
+requires-python = ">=3.10,<3.15"
+authors = [
+    {name = "Yasyrev Andrei", email = "a.yasyrev@gmail.com"}
+]
+classifiers = [
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "License :: OSI Approved :: Apache Software License",
+    "Operating System :: OS Independent",
+]
+dependencies = ["rich"]
+
+[project.urls]
+Homepage = "https://github.com/ayasyrev/benchmark_utils"
+Repository = "https://github.com/ayasyrev/benchmark_utils"
+
+[project.optional-dependencies]
+test = [
+    "pytest",
+    "pytest-cov",
+]
+dev = [
+    "black",
+    "black[jupyter]",
+    "coverage[toml]",
+    "flake8",
+    "isort",
+    "mypy",
+    "nbmetaclean",
+    "nox",
+    "pre-commit",
+    "pytest",
+    "pytest-cov",
+    "ruff",
+]
+
 [tool.ruff]
-# Assume Python 3.8
-target-version = "py38"
+# Assume Python 3.10
+target-version = "py310"
 
 # Same as Black.
 line-length = 120
@@ -33,7 +82,6 @@ exclude = [
   "build",
   "dist",
   "node_modules",
-  "setup.py",
   "site-packages",
   "tests",
   "tools",
