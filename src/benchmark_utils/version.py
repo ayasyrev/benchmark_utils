@@ -100,17 +100,8 @@ def get_version() -> str:
         from importlib.metadata import version
 
         return version("benchmark_utils")
-    except ImportError:
+    except importlib.metadata.PackageNotFoundError:
         return _read_version_from_pyproject()
-    except Exception:
-        from importlib.metadata import PackageNotFoundError
-
-        try:
-            raise
-        except PackageNotFoundError:
-            return _read_version_from_pyproject()
-        except Exception:
-            raise
 
 
 __version__ = get_version()  # pragma: no cover
