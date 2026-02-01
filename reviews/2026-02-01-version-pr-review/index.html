@@ -1,0 +1,1856 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../../plans/2026-02-01-version-resolution-hardening/">
+      
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
+    
+    
+      
+        <title>PR Review: Dynamic Version Resolution - Benchmark_utils</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+  
+
+
+  
+  
+
+<script id="__analytics">function __md_analytics(){function e(){dataLayer.push(arguments)}window.dataLayer=window.dataLayer||[],e("js",new Date),e("config","G-0F3FK713C2"),document.addEventListener("DOMContentLoaded",(function(){document.forms.search&&document.forms.search.query.addEventListener("blur",(function(){this.value&&e("event","search",{search_term:this.value})}));document$.subscribe((function(){var t=document.forms.feedback;if(void 0!==t)for(var a of t.querySelectorAll("[type=submit]"))a.addEventListener("click",(function(a){a.preventDefault();var n=document.location.pathname,d=this.getAttribute("data-md-value");e("event","feedback",{page:n,data:d}),t.firstElementChild.disabled=!0;var r=t.querySelector(".md-feedback__note [data-md-value='"+d+"']");r&&(r.hidden=!1)})),t.hidden=!1})),location$.subscribe((function(t){e("config","G-0F3FK713C2",{page_path:t.pathname})}))}));var t=document.createElement("script");t.async=!0,t.src="https://www.googletagmanager.com/gtag/js?id=G-0F3FK713C2",document.getElementById("__analytics").insertAdjacentElement("afterEnd",t)}</script>
+  
+    <script>"undefined"!=typeof __md_analytics&&__md_analytics()</script>
+  
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#pr-review-dynamic-version-resolution" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Benchmark_utils" class="md-header__button md-logo" aria-label="Benchmark_utils" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Benchmark_utils
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              PR Review: Dynamic Version Resolution
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 6H7c-3.31 0-6 2.69-6 6s2.69 6 6 6h10c3.31 0 6-2.69 6-6s-2.69-6-6-6m0 10H7c-2.21 0-4-1.79-4-4s1.79-4 4-4h10c2.21 0 4 1.79 4 4s-1.79 4-4 4M7 9c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 7H7a5 5 0 0 0-5 5 5 5 0 0 0 5 5h10a5 5 0 0 0 5-5 5 5 0 0 0-5-5m0 8a3 3 0 0 1-3-3 3 3 0 0 1 3-3 3 3 0 0 1 3 3 3 3 0 0 1-3 3"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/ayasyrev/benchmark_utils" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    benchmark_utils
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Benchmark_utils" class="md-nav__button md-logo" aria-label="Benchmark_utils" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Benchmark_utils
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/ayasyrev/benchmark_utils" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    benchmark_utils
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Plans
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Plans
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../plans/2026-02-01-inventory/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    UV Migration Inventory - 2026-02-01
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../plans/2026-02-01-uv-migration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    UV Migration Implementation Plan
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../plans/2026-02-01-version-from-pyproject/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Version From Pyproject Implementation Plan
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../plans/2026-02-01-version-resolution-hardening/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Version Resolution Hardening Implementation Plan
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reviews
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Reviews
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PR Review: Dynamic Version Resolution
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PR Review: Dynamic Version Resolution
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#executive-summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Executive Summary
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#files-changed" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Files Changed
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#critical-issues-6-found" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Critical Issues (6 found)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Critical Issues (6 found)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-missing-tomli-dependency-for-python-310" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Missing tomli dependency for Python 3.10
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-overly-broad-except-exception-masks-errors" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Overly broad except Exception masks errors
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-module-import-crash-when-tomli-unavailable-on-python-310" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Module import crash when tomli unavailable on Python 3.10
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-no-test-for-missing-pyprojecttoml-fallback" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. No test for missing pyproject.toml fallback
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-000-fallback-masks-all-errors-silently" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. "0.0.0" fallback masks all errors silently
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#6-no-test-for-python-310-without-tomli" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. No test for Python 3.10 without tomli
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#important-issues-7-found" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Important Issues (7 found)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Important Issues (7 found)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#7-path-traversal-assumes-specific-directory-structure" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. Path traversal assumes specific directory structure
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#8-no-test-for-malformed-pyprojecttoml" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. No test for malformed pyproject.toml
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#9-test-reload-pattern-causes-state-pollution" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. Test reload pattern causes state pollution
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#10-hardcoded-version-assertion-creates-brittleness" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10. Hardcoded version assertion creates brittleness
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#11-missing-toml-parsing-error-context" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11. Missing TOML parsing error context
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#12-silent-file-read-failures-permissions-io-errors" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        12. Silent file read failures (permissions, I/O errors)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#13-no-test-for-missing-version-field-in-pyprojecttoml" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        13. No test for missing version field in pyproject.toml
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#suggestions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Suggestions
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Suggestions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#14-tests-couple-to-implementation-details" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        14. Tests couple to implementation details
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#strengths" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Strengths
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#recommended-action-plan" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Recommended Action Plan
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Recommended Action Plan">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#must-fix-before-merge" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Must Fix Before Merge
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#strongly-recommended" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Strongly Recommended
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#nice-to-have" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Nice to Have
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#verification-steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Verification Steps
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#summary-table" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Summary Table
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#executive-summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Executive Summary
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#files-changed" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Files Changed
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#critical-issues-6-found" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Critical Issues (6 found)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Critical Issues (6 found)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-missing-tomli-dependency-for-python-310" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Missing tomli dependency for Python 3.10
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-overly-broad-except-exception-masks-errors" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Overly broad except Exception masks errors
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-module-import-crash-when-tomli-unavailable-on-python-310" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Module import crash when tomli unavailable on Python 3.10
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-no-test-for-missing-pyprojecttoml-fallback" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. No test for missing pyproject.toml fallback
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-000-fallback-masks-all-errors-silently" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. "0.0.0" fallback masks all errors silently
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#6-no-test-for-python-310-without-tomli" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. No test for Python 3.10 without tomli
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#important-issues-7-found" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Important Issues (7 found)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Important Issues (7 found)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#7-path-traversal-assumes-specific-directory-structure" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. Path traversal assumes specific directory structure
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#8-no-test-for-malformed-pyprojecttoml" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. No test for malformed pyproject.toml
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#9-test-reload-pattern-causes-state-pollution" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. Test reload pattern causes state pollution
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#10-hardcoded-version-assertion-creates-brittleness" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10. Hardcoded version assertion creates brittleness
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#11-missing-toml-parsing-error-context" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11. Missing TOML parsing error context
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#12-silent-file-read-failures-permissions-io-errors" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        12. Silent file read failures (permissions, I/O errors)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#13-no-test-for-missing-version-field-in-pyprojecttoml" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        13. No test for missing version field in pyproject.toml
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#suggestions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Suggestions
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Suggestions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#14-tests-couple-to-implementation-details" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        14. Tests couple to implementation details
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#strengths" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Strengths
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#recommended-action-plan" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Recommended Action Plan
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Recommended Action Plan">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#must-fix-before-merge" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Must Fix Before Merge
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#strongly-recommended" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Strongly Recommended
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#nice-to-have" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Nice to Have
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#verification-steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Verification Steps
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#summary-table" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Summary Table
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="pr-review-dynamic-version-resolution">PR Review: Dynamic Version Resolution</h1>
+<p><strong>Commits Reviewed:</strong> ecc995c, f760891
+<strong>Review Date:</strong> 2026-02-01
+<strong>Reviewers:</strong> code-reviewer, pr-test-analyzer, silent-failure-hunter agents</p>
+<hr />
+<h2 id="executive-summary">Executive Summary</h2>
+<p>The implementation of dynamic version resolution has <strong>6 Critical issues</strong> and <strong>7 Important issues</strong> that need to be addressed before merging. The most significant concerns are:</p>
+<ol>
+<li><strong>Missing <code>tomli</code> dependency</strong> will cause runtime crashes on Python 3.10</li>
+<li><strong>Silent failure pattern</strong> - all errors return "0.0.0" without logging</li>
+<li><strong>Overly broad exception handling</strong> that masks programming errors</li>
+</ol>
+<hr />
+<h2 id="files-changed">Files Changed</h2>
+<ul>
+<li><code>src/benchmark_utils/version.py</code> - Dynamic version resolution implementation</li>
+<li><code>tests/test_version.py</code> - New test file with 2 tests</li>
+<li><code>docs/plans/2026-02-01-version-from-pyproject.md</code> - Plan documentation</li>
+</ul>
+<hr />
+<h2 id="critical-issues-6-found">Critical Issues (6 found)</h2>
+<h3 id="1-missing-tomli-dependency-for-python-310">1. Missing tomli dependency for Python 3.10</h3>
+<p><strong>Agent:</strong> code-reviewer
+<strong>File:</strong> <code>pyproject.toml</code> (dependencies)
+<strong>Confidence:</strong> 95
+<strong>Line:</strong> N/A - dependency not added</p>
+<p><strong>Issue:</strong> The code attempts to import <code>tomli</code> as a fallback for Python 3.10, but <code>tomli</code> is not listed in <code>pyproject.toml</code> dependencies. The project specifies <code>requires-python = "&gt;=3.10,&lt;3.15"</code> and includes Python 3.10 support, but the fallback will fail on Python 3.10 systems without <code>tomli</code> installed.</p>
+<p><strong>Fix:</strong> Add conditional dependency to <code>pyproject.toml</code>:
+<div class="highlight"><pre><span></span><code><span class="n">dependencies</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="s2">&quot;rich&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;tomli&gt;=2.0.0; python_version&lt;&#39;3.11&#39;&quot;</span>
+<span class="p">]</span>
+</code></pre></div></p>
+<hr />
+<h3 id="2-overly-broad-except-exception-masks-errors">2. Overly broad <code>except Exception</code> masks errors</h3>
+<p><strong>Agent:</strong> code-reviewer, silent-failure-hunter
+<strong>File:</strong> <code>src/benchmark_utils/version.py:42</code>
+<strong>Confidence:</strong> 90</p>
+<p><strong>Issue:</strong> <code>except Exception:</code> catches everything including <code>ImportError</code>, <code>AttributeError</code>, <code>TypeError</code>, <code>MemoryError</code>, <code>KeyboardInterrupt</code>, <code>SystemExit</code>, and any other unexpected exception. Programming errors like passing wrong argument types would be silently caught.</p>
+<p><strong>Hidden Errors:</strong>
+- Programming errors (wrong argument types)
+- System-level failures (memory errors)
+- Interrupts during version lookup
+- Import corruption issues</p>
+<p><strong>Fix:</strong>
+<div class="highlight"><pre><span></span><code><span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">importlib.metadata</span><span class="w"> </span><span class="kn">import</span> <span class="n">version</span>
+    <span class="k">return</span> <span class="n">version</span><span class="p">(</span><span class="s2">&quot;benchmark_utils&quot;</span><span class="p">)</span>
+<span class="k">except</span> <span class="n">importlib</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">PackageNotFoundError</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">_read_version_from_pyproject</span><span class="p">()</span>
+</code></pre></div></p>
+<hr />
+<h3 id="3-module-import-crash-when-tomli-unavailable-on-python-310">3. Module import crash when tomli unavailable on Python 3.10</h3>
+<p><strong>Agent:</strong> code-reviewer, silent-failure-hunter
+<strong>File:</strong> <code>src/benchmark_utils/version.py:17-19</code>
+<strong>Confidence:</strong> 85</p>
+<p><strong>Issue:</strong> When <code>tomllib</code> is not available (Python 3.10), the code attempts to import <code>tomli</code>. If <code>tomli</code> is not installed, an unhandled <code>ModuleNotFoundError</code> will crash the module import with a cryptic error message.</p>
+<p><strong>User Impact:</strong> Users on Python 3.10 who install the package without dev dependencies will see a raw <code>ModuleNotFoundError</code> that doesn't explain what to do.</p>
+<p><strong>Fix:</strong>
+<div class="highlight"><pre><span></span><code><span class="k">try</span><span class="p">:</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">tomllib</span>
+<span class="k">except</span> <span class="ne">ModuleNotFoundError</span><span class="p">:</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">tomli</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">tomllib</span>
+    <span class="k">except</span> <span class="ne">ModuleNotFoundError</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+            <span class="s2">&quot;Cannot determine package version: benchmark_utils requires either &quot;</span>
+            <span class="s2">&quot;Python 3.11+ (for built-in tomllib) or tomli installed. &quot;</span>
+            <span class="s2">&quot;Install tomli with: pip install tomli&quot;</span>
+        <span class="p">)</span>
+</code></pre></div></p>
+<hr />
+<h3 id="4-no-test-for-missing-pyprojecttoml-fallback">4. No test for missing pyproject.toml fallback</h3>
+<p><strong>Agent:</strong> pr-test-analyzer
+<strong>File:</strong> <code>tests/test_version.py</code> (missing test)
+<strong>Rating:</strong> 9/10
+<strong>Lines:</strong> 24-25</p>
+<p><strong>Issue:</strong> Lines 24-25 (the exception handler returning "0.0.0") are not tested. This code executes when <code>pyproject.toml</code> is missing, unreadable, or when file operations fail. This is the ultimate fallback and must work.</p>
+<p><strong>What could break:</strong>
+- Development environments where <code>pyproject.toml</code> was accidentally deleted
+- Docker containers where file mounting failed
+- Corrupted filesystems
+- Permission issues preventing file reads</p>
+<p><strong>Test to add:</strong>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">test_version_fallback_to_zero_when_pyproject_missing</span><span class="p">(</span><span class="n">monkeypatch</span><span class="p">,</span> <span class="n">tmp_path</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Test that version returns &#39;0.0.0&#39; when metadata unavailable and pyproject.toml missing&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">fake_version_raises</span><span class="p">(</span><span class="n">_</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;metadata unavailable&quot;</span><span class="p">)</span>
+
+    <span class="n">monkeypatch</span><span class="o">.</span><span class="n">setattr</span><span class="p">(</span><span class="n">metadata</span><span class="p">,</span> <span class="s2">&quot;version&quot;</span><span class="p">,</span> <span class="n">fake_version_raises</span><span class="p">)</span>
+
+    <span class="c1"># Patch Path to point to non-existent directory</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">benchmark_utils.version</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">version_mod</span>
+    <span class="n">original_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">version_mod</span><span class="o">.</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">mock_parent</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">tmp_path</span>  <span class="c1"># Directory without pyproject.toml</span>
+
+    <span class="n">monkeypatch</span><span class="o">.</span><span class="n">setattr</span><span class="p">(</span><span class="n">Path</span><span class="p">,</span> <span class="s2">&quot;parent&quot;</span><span class="p">,</span> <span class="nb">property</span><span class="p">(</span><span class="n">mock_parent</span><span class="p">))</span>
+    <span class="n">importlib</span><span class="o">.</span><span class="n">reload</span><span class="p">(</span><span class="n">version_mod</span><span class="p">)</span>
+
+    <span class="k">assert</span> <span class="n">version_mod</span><span class="o">.</span><span class="n">__version__</span> <span class="o">==</span> <span class="s2">&quot;0.0.0&quot;</span>
+</code></pre></div></p>
+<hr />
+<h3 id="5-000-fallback-masks-all-errors-silently">5. "0.0.0" fallback masks all errors silently</h3>
+<p><strong>Agent:</strong> silent-failure-hunter
+<strong>File:</strong> <code>src/benchmark_utils/version.py:25, 42</code>
+<strong>Severity:</strong> CRITICAL</p>
+<p><strong>Issue:</strong> The function returns "0.0.0" as a fallback in multiple scenarios. This is misleading because:</p>
+<ol>
+<li>"0.0.0" is a valid semantic version that means something specific (initial development)</li>
+<li>Users might think they're running version 0.0.0 when they're actually in an error state</li>
+<li>Code checking <code>if __version__ == "0.0.0"</code> can't distinguish between actual version 0.0.0 and error state</li>
+<li>Errors in version detection propagate silently through the system</li>
+</ol>
+<p><strong>User Impact:</strong>
+- Dependency resolution tools might treat "0.0.0" as a real version
+- Bug reports will include incorrect version information
+- Users can't detect when version resolution failed
+- Downstream tools that rely on accurate versioning will malfunction</p>
+<p><strong>Recommended Fix:</strong> Use "UNKNOWN" sentinel and add warnings:
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
+
+<span class="n">_VERSION_UNKNOWN</span> <span class="o">=</span> <span class="s2">&quot;UNKNOWN&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_read_version_from_pyproject</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1"># ... existing code ...</span>
+    <span class="k">except</span> <span class="ne">FileNotFoundError</span><span class="p">:</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;pyproject.toml not found at </span><span class="si">{</span><span class="n">pyproject_path</span><span class="si">}</span><span class="s2">, &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;version will be reported as &#39;</span><span class="si">{</span><span class="n">_VERSION_UNKNOWN</span><span class="si">}</span><span class="s2">&#39;&quot;</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">_VERSION_UNKNOWN</span>
+    <span class="k">except</span> <span class="ne">OSError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Cannot read </span><span class="si">{</span><span class="n">pyproject_path</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">, &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;version will be reported as &#39;</span><span class="si">{</span><span class="n">_VERSION_UNKNOWN</span><span class="si">}</span><span class="s2">&#39;&quot;</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">_VERSION_UNKNOWN</span>
+</code></pre></div></p>
+<hr />
+<h3 id="6-no-test-for-python-310-without-tomli">6. No test for Python 3.10 without tomli</h3>
+<p><strong>Agent:</strong> pr-test-analyzer
+<strong>File:</strong> <code>tests/test_version.py</code> (missing test)
+<strong>Rating:</strong> 8/10
+<strong>Lines:</strong> 17-19</p>
+<p><strong>Issue:</strong> When <code>tomllib</code> is not available (Python 3.10), the code attempts to import <code>tomli</code>. If <code>tomli</code> is not installed, an unhandled <code>ModuleNotFoundError</code> will crash the module import.</p>
+<p><strong>Test to add:</strong>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">test_python_310_without_tomli_graceful_fallback</span><span class="p">(</span><span class="n">monkeypatch</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Test that Python 3.10 without tomli falls back to 0.0.0 rather than crashing&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">fake_version_raises</span><span class="p">(</span><span class="n">_</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;metadata unavailable&quot;</span><span class="p">)</span>
+
+    <span class="n">monkeypatch</span><span class="o">.</span><span class="n">setattr</span><span class="p">(</span><span class="n">metadata</span><span class="p">,</span> <span class="s2">&quot;version&quot;</span><span class="p">,</span> <span class="n">fake_version_raises</span><span class="p">)</span>
+
+    <span class="c1"># Simulate both tomllib and tomli being unavailable</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">builtins</span>
+    <span class="n">original_import</span> <span class="o">=</span> <span class="n">builtins</span><span class="o">.</span><span class="n">__import__</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">mock_import</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;tomllib&#39;</span><span class="p">,</span> <span class="s1">&#39;tomli&#39;</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ModuleNotFoundError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No module named &#39;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">original_import</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="n">monkeypatch</span><span class="o">.</span><span class="n">setattr</span><span class="p">(</span><span class="n">builtins</span><span class="p">,</span> <span class="s1">&#39;__import__&#39;</span><span class="p">,</span> <span class="n">mock_import</span><span class="p">)</span>
+    <span class="n">importlib</span><span class="o">.</span><span class="n">reload</span><span class="p">(</span><span class="n">version_mod</span><span class="p">)</span>
+
+    <span class="c1"># Should fall back to 0.0.0 instead of crashing</span>
+    <span class="k">assert</span> <span class="n">version_mod</span><span class="o">.</span><span class="n">__version__</span> <span class="o">==</span> <span class="s2">&quot;0.0.0&quot;</span>
+</code></pre></div></p>
+<hr />
+<h2 id="important-issues-7-found">Important Issues (7 found)</h2>
+<h3 id="7-path-traversal-assumes-specific-directory-structure">7. Path traversal assumes specific directory structure</h3>
+<p><strong>Agent:</strong> code-reviewer
+<strong>File:</strong> <code>src/benchmark_utils/version.py:12</code>
+<strong>Confidence:</strong> 82</p>
+<p><strong>Issue:</strong> <code>Path(__file__).parent.parent.parent / "pyproject.toml"</code> assumes the package is installed as <code>src/benchmark_utils/</code>. This breaks if:
+- The package is installed in editable mode with different structure
+- The module is imported from a different location
+- The code is run from a different working directory</p>
+<p><strong>Fix:</strong> Implement path search walking up directory tree:
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">_find_pyproject_toml</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Find pyproject.toml by walking up the directory tree.&quot;&quot;&quot;</span>
+    <span class="n">current</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span><span class="o">.</span><span class="n">parent</span>
+    <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">):</span>  <span class="c1"># Limit traversal depth</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">current</span> <span class="o">/</span> <span class="s2">&quot;pyproject.toml&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+            <span class="k">return</span> <span class="n">current</span> <span class="o">/</span> <span class="s2">&quot;pyproject.toml&quot;</span>
+        <span class="k">if</span> <span class="n">current</span><span class="o">.</span><span class="n">parent</span> <span class="o">==</span> <span class="n">current</span><span class="p">:</span>  <span class="c1"># Reached root</span>
+            <span class="k">break</span>
+        <span class="n">current</span> <span class="o">=</span> <span class="n">current</span><span class="o">.</span><span class="n">parent</span>
+    <span class="k">return</span> <span class="kc">None</span>
+</code></pre></div></p>
+<hr />
+<h3 id="8-no-test-for-malformed-pyprojecttoml">8. No test for malformed pyproject.toml</h3>
+<p><strong>Agent:</strong> pr-test-analyzer
+<strong>File:</strong> <code>tests/test_version.py</code> (missing test)
+<strong>Rating:</strong> 7/10
+<strong>Lines:</strong> 21-23</p>
+<p><strong>Issue:</strong> The code catches <code>FileNotFoundError</code> and <code>OSError</code> but not <code>tomllib.TOMLDecodeError</code> (which occurs when the TOML file is malformed). A manually edited <code>pyproject.toml</code> with syntax errors will cause an unhandled exception.</p>
+<p><strong>Test to add:</strong>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">test_malformed_pyproject_toml</span><span class="p">(</span><span class="n">monkeypatch</span><span class="p">,</span> <span class="n">tmp_path</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Test fallback to 0.0.0 when pyproject.toml is malformed&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">fake_version_raises</span><span class="p">(</span><span class="n">_</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;metadata unavailable&quot;</span><span class="p">)</span>
+
+    <span class="n">monkeypatch</span><span class="o">.</span><span class="n">setattr</span><span class="p">(</span><span class="n">metadata</span><span class="p">,</span> <span class="s2">&quot;version&quot;</span><span class="p">,</span> <span class="n">fake_version_raises</span><span class="p">)</span>
+
+    <span class="c1"># Create a malformed pyproject.toml</span>
+    <span class="n">bad_pyproject</span> <span class="o">=</span> <span class="n">tmp_path</span> <span class="o">/</span> <span class="s2">&quot;pyproject.toml&quot;</span>
+    <span class="n">bad_pyproject</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span><span class="s2">&quot;[project</span><span class="se">\n</span><span class="s2">version = &#39;0.2.5b1&#39;&quot;</span><span class="p">)</span>  <span class="c1"># Missing closing bracket</span>
+
+    <span class="c1"># Patch the path resolution</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">benchmark_utils.version</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">version_mod</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">mock_parent</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">tmp_path</span><span class="o">.</span><span class="n">parent</span>
+
+    <span class="n">monkeypatch</span><span class="o">.</span><span class="n">setattr</span><span class="p">(</span><span class="n">Path</span><span class="p">,</span> <span class="s2">&quot;parent&quot;</span><span class="p">,</span> <span class="nb">property</span><span class="p">(</span><span class="n">mock_parent</span><span class="p">))</span>
+    <span class="n">importlib</span><span class="o">.</span><span class="n">reload</span><span class="p">(</span><span class="n">version_mod</span><span class="p">)</span>
+
+    <span class="k">assert</span> <span class="n">version_mod</span><span class="o">.</span><span class="n">__version__</span> <span class="o">==</span> <span class="s2">&quot;0.0.0&quot;</span>
+</code></pre></div></p>
+<hr />
+<h3 id="9-test-reload-pattern-causes-state-pollution">9. Test reload pattern causes state pollution</h3>
+<p><strong>Agent:</strong> code-reviewer
+<strong>File:</strong> <code>tests/test_version.py:16, 27</code>
+<strong>Confidence:</strong> 80</p>
+<p><strong>Issue:</strong> Using <code>importlib.reload()</code> in tests without cleanup can pollute module state across test runs. While tests are isolated within each function, the monkeypatch on <code>metadata.version</code> persists after the test completes.</p>
+<p><strong>Fix:</strong> Consider using a fixture with cleanup or test internal functions directly:
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">test_version_from_pyproject</span><span class="p">(</span><span class="n">monkeypatch</span><span class="p">,</span> <span class="n">tmp_path</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Test fallback to pyproject.toml when metadata unavailable&quot;&quot;&quot;</span>
+    <span class="c1"># Mock the version function to raise error</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">fake_version_raises</span><span class="p">(</span><span class="n">_</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">importlib</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">PackageNotFoundError</span><span class="p">(</span><span class="s2">&quot;benchmark_utils&quot;</span><span class="p">)</span>
+
+    <span class="n">monkeypatch</span><span class="o">.</span><span class="n">setattr</span><span class="p">(</span>
+        <span class="s2">&quot;benchmark_utils.version.get_version&quot;</span><span class="p">,</span>
+        <span class="k">lambda</span><span class="p">:</span> <span class="n">_read_version_from_pyproject</span><span class="p">()</span>
+    <span class="p">)</span>
+    <span class="c1"># Or test _read_version_from_pyproject() directly with a mock pyproject.toml</span>
+</code></pre></div></p>
+<hr />
+<h3 id="10-hardcoded-version-assertion-creates-brittleness">10. Hardcoded version assertion creates brittleness</h3>
+<p><strong>Agent:</strong> code-reviewer
+<strong>File:</strong> <code>tests/test_version.py:29</code>
+<strong>Confidence:</strong> 80</p>
+<p><strong>Issue:</strong> The test asserts <code>version_mod.__version__ == "0.2.5b1"</code>, which will break whenever the version in <code>pyproject.toml</code> changes. This creates maintenance overhead.</p>
+<p><strong>Fix:</strong> Read the version from <code>pyproject.toml</code> dynamically in the test:
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">tomllib</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">test_version_from_pyproject</span><span class="p">(</span><span class="n">monkeypatch</span><span class="p">):</span>
+    <span class="c1"># Read expected version from actual pyproject.toml</span>
+    <span class="n">pyproject</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="s2">&quot;pyproject.toml&quot;</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">pyproject</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">expected_version</span> <span class="o">=</span> <span class="n">tomllib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)[</span><span class="s2">&quot;project&quot;</span><span class="p">][</span><span class="s2">&quot;version&quot;</span><span class="p">]</span>
+
+    <span class="c1"># ... rest of test</span>
+    <span class="k">assert</span> <span class="n">version_mod</span><span class="o">.</span><span class="n">__version__</span> <span class="o">==</span> <span class="n">expected_version</span>
+</code></pre></div></p>
+<hr />
+<h3 id="11-missing-toml-parsing-error-context">11. Missing TOML parsing error context</h3>
+<p><strong>Agent:</strong> silent-failure-hunter
+<strong>File:</strong> <code>src/benchmark_utils/version.py:22</code>
+<strong>Severity:</strong> HIGH</p>
+<p><strong>Issue:</strong> If <code>pyproject.toml</code> has malformed TOML, users get a raw <code>TOMLDecodeError</code> that doesn't mention which file failed to parse. Users might not realize <code>pyproject.toml</code> is the problem.</p>
+<p><strong>Fix:</strong> Wrap the TOML parsing to provide better context:
+<div class="highlight"><pre><span></span><code><span class="k">try</span><span class="p">:</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">pyproject_path</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">tomllib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+<span class="k">except</span> <span class="n">tomllib</span><span class="o">.</span><span class="n">TOMLDecodeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s2">&quot;Failed to parse </span><span class="si">{</span><span class="n">pyproject_path</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span>
+</code></pre></div></p>
+<hr />
+<h3 id="12-silent-file-read-failures-permissions-io-errors">12. Silent file read failures (permissions, I/O errors)</h3>
+<p><strong>Agent:</strong> silent-failure-hunter
+<strong>File:</strong> <code>src/benchmark_utils/version.py:24</code>
+<strong>Severity:</strong> CRITICAL</p>
+<p><strong>Issue:</strong> The catch block for <code>(FileNotFoundError, OSError)</code> silently returns "0.0.0" without logging. This swallows:
+- <code>PermissionError</code> - User lacks read permissions
+- <code>IsADirectoryError</code> - <code>pyproject.toml</code> is a directory, not a file
+- Other <code>OSError</code> subclasses - disk I/O errors, network filesystem issues</p>
+<p><strong>User Impact:</strong>
+- If <code>pyproject.toml</code> exists but is unreadable due to permissions, the error is silently ignored
+- If the file path calculation is wrong, no error is raised
+- Users get "0.0.0" when the file exists but can't be read, with no indication of the problem</p>
+<p><strong>Fix:</strong> Add warnings before falling back (see Issue #5 for full implementation).</p>
+<hr />
+<h3 id="13-no-test-for-missing-version-field-in-pyprojecttoml">13. No test for missing version field in pyproject.toml</h3>
+<p><strong>Agent:</strong> pr-test-analyzer
+<strong>File:</strong> <code>tests/test_version.py</code> (missing test)
+<strong>Rating:</strong> 6/10
+<strong>Lines:</strong> 23</p>
+<p><strong>Issue:</strong> The code uses <code>.get("project", {}).get("version", "0.0.0")</code> which handles this case, but it's not explicitly tested. Adding a test documents this behavior and prevents regression.</p>
+<p><strong>Test to add:</strong>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">test_pyproject_without_version_field</span><span class="p">(</span><span class="n">monkeypatch</span><span class="p">,</span> <span class="n">tmp_path</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Test that missing version field in pyproject.toml returns 0.0.0&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">fake_version_raises</span><span class="p">(</span><span class="n">_</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;metadata unavailable&quot;</span><span class="p">)</span>
+
+    <span class="n">monkeypatch</span><span class="o">.</span><span class="n">setattr</span><span class="p">(</span><span class="n">metadata</span><span class="p">,</span> <span class="s2">&quot;version&quot;</span><span class="p">,</span> <span class="n">fake_version_raises</span><span class="p">)</span>
+
+    <span class="c1"># Create pyproject.toml without version field</span>
+    <span class="n">no_version_pyproject</span> <span class="o">=</span> <span class="n">tmp_path</span> <span class="o">/</span> <span class="s2">&quot;pyproject.toml&quot;</span>
+    <span class="n">no_version_pyproject</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span><span class="s2">&quot;[project]</span><span class="se">\n</span><span class="s2">name = &#39;benchmark_utils&#39;&quot;</span><span class="p">)</span>
+
+    <span class="kn">import</span><span class="w"> </span><span class="nn">benchmark_utils.version</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">version_mod</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">mock_parent</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">tmp_path</span><span class="o">.</span><span class="n">parent</span>
+
+    <span class="n">monkeypatch</span><span class="o">.</span><span class="n">setattr</span><span class="p">(</span><span class="n">Path</span><span class="p">,</span> <span class="s2">&quot;parent&quot;</span><span class="p">,</span> <span class="nb">property</span><span class="p">(</span><span class="n">mock_parent</span><span class="p">))</span>
+    <span class="n">importlib</span><span class="o">.</span><span class="n">reload</span><span class="p">(</span><span class="n">version_mod</span><span class="p">)</span>
+
+    <span class="k">assert</span> <span class="n">version_mod</span><span class="o">.</span><span class="n">__version__</span> <span class="o">==</span> <span class="s2">&quot;0.0.0&quot;</span>
+</code></pre></div></p>
+<hr />
+<h2 id="suggestions">Suggestions</h2>
+<h3 id="14-tests-couple-to-implementation-details">14. Tests couple to implementation details</h3>
+<p><strong>Agent:</strong> pr-test-analyzer
+<strong>Rating:</strong> 4/10</p>
+<p><strong>Observation:</strong> The tests mock <code>importlib.metadata.version</code> directly, which is an implementation detail. If the implementation changes to use a different metadata source, the tests would fail even if behavior remains correct.</p>
+<p><strong>Verdict:</strong> Acceptable given the constraints, but document why mocking is necessary in test docstrings.</p>
+<hr />
+<h2 id="strengths">Strengths</h2>
+<ol>
+<li>
+<p><strong>Good test naming:</strong> <code>test_version_from_metadata</code> and <code>test_version_from_pyproject</code> clearly describe what is being tested</p>
+</li>
+<li>
+<p><strong>Docstrings present:</strong> Each test has a clear docstring explaining its purpose</p>
+</li>
+<li>
+<p><strong>Monkeypatch used correctly:</strong> The tests properly use pytest's <code>monkeypatch</code> fixture for reversible mocking</p>
+</li>
+<li>
+<p><strong>Tests the primary use case:</strong> The happy path (metadata available) and primary fallback (<code>pyproject.toml</code>) are both covered</p>
+</li>
+<li>
+<p><strong>Test isolation:</strong> Each test independently sets up its mocking conditions</p>
+</li>
+<li>
+<p><strong>Proper Python practices:</strong> Type annotations, docstrings, and the <code>from __future__ import annotations</code> pattern used elsewhere in the codebase</p>
+</li>
+</ol>
+<hr />
+<h2 id="recommended-action-plan">Recommended Action Plan</h2>
+<h3 id="must-fix-before-merge">Must Fix Before Merge</h3>
+<ol>
+<li>
+<p><strong>Add tomli dependency</strong> to <code>pyproject.toml</code>:
+   <div class="highlight"><pre><span></span><code><span class="n">dependencies</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;rich&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;tomli&gt;=2.0.0; python_version&lt;&#39;3.11&#39;&quot;</span><span class="p">]</span>
+</code></pre></div></p>
+</li>
+<li>
+<p><strong>Fix exception handling</strong> in <code>get_version()</code>:
+   <div class="highlight"><pre><span></span><code><span class="k">except</span> <span class="n">importlib</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">PackageNotFoundError</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">_read_version_from_pyproject</span><span class="p">()</span>
+</code></pre></div></p>
+</li>
+<li>
+<p><strong>Add error handling</strong> for missing tomli on Python 3.10</p>
+</li>
+<li>
+<p><strong>Add tests</strong> for:</p>
+</li>
+<li>Missing <code>pyproject.toml</code> returning "0.0.0" or "UNKNOWN"</li>
+<li>Python 3.10 without tomli</li>
+</ol>
+<h3 id="strongly-recommended">Strongly Recommended</h3>
+<ol>
+<li>
+<p><strong>Replace "0.0.0" with "UNKNOWN"</strong> sentinel and add warnings</p>
+</li>
+<li>
+<p><strong>Add test</strong> for malformed <code>pyproject.toml</code></p>
+</li>
+<li>
+<p><strong>Improve error context</strong> for TOML parsing failures</p>
+</li>
+</ol>
+<h3 id="nice-to-have">Nice to Have</h3>
+<ol>
+<li>
+<p><strong>Make tests less brittle</strong> by reading version dynamically from <code>pyproject.toml</code></p>
+</li>
+<li>
+<p><strong>Implement robust path resolution</strong> instead of hardcoded traversal</p>
+</li>
+<li>
+<p><strong>Consider fixture-based approach</strong> instead of <code>importlib.reload()</code></p>
+</li>
+</ol>
+<hr />
+<h2 id="verification-steps">Verification Steps</h2>
+<p>After fixes, re-run:
+<div class="highlight"><pre><span></span><code><span class="c1"># Run version tests</span>
+uv<span class="w"> </span>run<span class="w"> </span>pytest<span class="w"> </span>tests/test_version.py<span class="w"> </span>-v
+
+<span class="c1"># Run full test suite</span>
+uv<span class="w"> </span>run<span class="w"> </span>pytest<span class="w"> </span>-v
+
+<span class="c1"># Re-run PR review to verify issues are resolved</span>
+</code></pre></div></p>
+<hr />
+<h2 id="summary-table">Summary Table</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Issue</th>
+<th>Severity</th>
+<th>Agent</th>
+<th>File</th>
+<th>Line</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Missing tomli dependency</td>
+<td>CRITICAL</td>
+<td>code-reviewer</td>
+<td>pyproject.toml</td>
+<td>N/A</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Overly broad except Exception</td>
+<td>CRITICAL</td>
+<td>code-reviewer, silent-failure-hunter</td>
+<td>version.py</td>
+<td>42</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Module import crash Python 3.10</td>
+<td>CRITICAL</td>
+<td>code-reviewer, silent-failure-hunter</td>
+<td>version.py</td>
+<td>17-19</td>
+</tr>
+<tr>
+<td>4</td>
+<td>No test for missing pyproject.toml</td>
+<td>CRITICAL</td>
+<td>pr-test-analyzer</td>
+<td>test_version.py</td>
+<td>N/A</td>
+</tr>
+<tr>
+<td>5</td>
+<td>"0.0.0" fallback masks errors</td>
+<td>CRITICAL</td>
+<td>silent-failure-hunter</td>
+<td>version.py</td>
+<td>25, 42</td>
+</tr>
+<tr>
+<td>6</td>
+<td>No test for Python 3.10 without tomli</td>
+<td>CRITICAL</td>
+<td>pr-test-analyzer</td>
+<td>test_version.py</td>
+<td>N/A</td>
+</tr>
+<tr>
+<td>7</td>
+<td>Path traversal assumes structure</td>
+<td>IMPORTANT</td>
+<td>code-reviewer</td>
+<td>version.py</td>
+<td>12</td>
+</tr>
+<tr>
+<td>8</td>
+<td>No test for malformed TOML</td>
+<td>IMPORTANT</td>
+<td>pr-test-analyzer</td>
+<td>test_version.py</td>
+<td>N/A</td>
+</tr>
+<tr>
+<td>9</td>
+<td>Test reload state pollution</td>
+<td>IMPORTANT</td>
+<td>code-reviewer</td>
+<td>test_version.py</td>
+<td>16, 27</td>
+</tr>
+<tr>
+<td>10</td>
+<td>Hardcoded version assertion</td>
+<td>IMPORTANT</td>
+<td>code-reviewer</td>
+<td>test_version.py</td>
+<td>29</td>
+</tr>
+<tr>
+<td>11</td>
+<td>Missing TOML error context</td>
+<td>HIGH</td>
+<td>silent-failure-hunter</td>
+<td>version.py</td>
+<td>22</td>
+</tr>
+<tr>
+<td>12</td>
+<td>Silent file read failures</td>
+<td>CRITICAL</td>
+<td>silent-failure-hunter</td>
+<td>version.py</td>
+<td>24</td>
+</tr>
+<tr>
+<td>13</td>
+<td>No test for missing version field</td>
+<td>IMPORTANT</td>
+<td>pr-test-analyzer</td>
+<td>test_version.py</td>
+<td>N/A</td>
+</tr>
+<tr>
+<td>14</td>
+<td>Tests couple to implementation</td>
+<td>SUGGESTION</td>
+<td>pr-test-analyzer</td>
+<td>test_version.py</td>
+<td>-</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Total Issues Found:</strong> 14 (6 Critical, 7 Important, 1 Suggestion)</p>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright &copy; 2022-2024 Andrei Yasyrev.
+    </div>
+  
+  
+    Made with
+    <a href="https://github.com/ayasyrev/nbdocs" target="_blank" rel="noopener">
+      NbDocs
+    </a>
+        and
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": [], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>
