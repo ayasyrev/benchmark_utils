@@ -11,7 +11,12 @@ def _read_version_from_pyproject() -> str:
     """
     pyproject_path = Path(__file__).parent.parent.parent / "pyproject.toml"
     try:
-        import tomllib
+        # Try tomllib first (Python 3.11+)
+        try:
+            import tomllib
+        except ModuleNotFoundError:
+            # Fallback to tomli for Python 3.10
+            import tomli as tomllib
 
         with open(pyproject_path, "rb") as f:
             data = tomllib.load(f)
