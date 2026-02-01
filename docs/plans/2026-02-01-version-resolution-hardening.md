@@ -11,9 +11,9 @@
 ---
 
 ### Task 0: Prep worktree (required)
-**Files:** none  
-**Step 1: Create isolated worktree**  
-Run: `@using-git-worktrees`  
+**Files:** none
+**Step 1: Create isolated worktree**
+Run: `@using-git-worktrees`
 Expected: new worktree ready for edits.
 
 ---
@@ -32,7 +32,7 @@ dependencies = [
 ```
 
 **Step 2: Verify pyproject parses**
-Run: `python -c "import tomllib; tomllib.load(open('pyproject.toml','rb'))"`  
+Run: `python -c "import tomllib; tomllib.load(open('pyproject.toml','rb'))"`
 Expected: exit code 0
 
 **Step 3: Commit**
@@ -57,7 +57,7 @@ Add placeholders in `tests/test_version.py` for:
 - metadata missing -> pyproject value
 
 **Step 2: Run tests to confirm failures**
-Run: `uv run pytest tests/test_version.py -v`  
+Run: `uv run pytest tests/test_version.py -v`
 Expected: FAILs
 
 **Step 3: Implement minimal code changes**
@@ -74,7 +74,7 @@ Add:
 - Narrow `get_version()` except to `importlib.metadata.PackageNotFoundError`
 
 **Step 4: Run targeted tests**
-Run: `uv run pytest tests/test_version.py -v`  
+Run: `uv run pytest tests/test_version.py -v`
 Expected: PASS
 
 **Step 5: Commit**
@@ -101,7 +101,7 @@ Call `version_mod.get_version()` directly instead of reloading and reading `__ve
 - Missing version field -> UNKNOWN + warning
 
 **Step 3: Run tests**
-Run: `uv run pytest tests/test_version.py -v`  
+Run: `uv run pytest tests/test_version.py -v`
 Expected: PASS
 
 **Step 4: Commit**
@@ -116,7 +116,7 @@ git commit -m "test: cover version fallbacks and warnings"
 **Files:** none
 
 **Step 1: Run full suite**
-Run: `uv run pytest -v`  
+Run: `uv run pytest -v`
 Expected: PASS
 
 **Step 2: Commit**

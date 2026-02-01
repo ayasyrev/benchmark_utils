@@ -1,6 +1,5 @@
 """tests for version module"""
 
-import importlib
 import importlib.metadata as metadata
 import importlib.util
 import warnings
@@ -11,24 +10,41 @@ import benchmark_utils.version as version_mod
 def test_version_from_metadata(monkeypatch):
     """Test that version comes from importlib.metadata when available"""
 
+    # Mock importlib.metadata.version at the module level
     def fake_version(_: str) -> str:
         return "9.9.9"
 
-    monkeypatch.setattr(metadata, "version", fake_version)
-    importlib.reload(version_mod)
-    assert version_mod.__version__ == "9.9.9"
+    import importlib.metadata as metadata_mod
+
+    monkeypatch.setattr(metadata_mod, "version", fake_version)
+
+    # Call get_version directly
+    result = version_mod.get_version()
+    assert result == "9.9.9"
 
 
 def test_version_from_pyproject(monkeypatch):
     """Test fallback to pyproject.toml when metadata unavailable"""
+    # Read expected version from pyproject.toml to avoid brittleness
+    pyproject_path = version_mod._find_pyproject_toml()
+    assert pyproject_path is not None, "pyproject.toml not found for test"
 
+    toml_lib = version_mod._load_tomllib()
+    assert toml_lib is not None, "toml library not found for test"
+
+    with open(pyproject_path, "rb") as f:
+        expected_version = toml_lib.load(f)["project"]["version"]
+
+    # Mock metadata to raise error
     def fake_version_raises(_: str) -> str:
         raise metadata.PackageNotFoundError("metadata unavailable")
 
-    monkeypatch.setattr(metadata, "version", fake_version_raises)
-    importlib.reload(version_mod)
-    # Should fallback to pyproject.toml version
-    assert version_mod.__version__ == "0.2.5b1"
+    import importlib.metadata as metadata_mod
+
+    monkeypatch.setattr(metadata_mod, "version", fake_version_raises)
+
+    result = version_mod.get_version()
+    assert result == expected_version
 
 
 def test_missing_pyproject_toml(tmp_path, monkeypatch):

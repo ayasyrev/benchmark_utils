@@ -73,7 +73,7 @@ def _read_version_from_pyproject() -> str:
     except OSError as e:
         warnings.warn(f"Failed to read {pyproject_path}: {e}", RuntimeWarning, stacklevel=3)
         return _VERSION_UNKNOWN
-    except Exception as e:
+    except toml_lib.TOMLDecodeError as e:
         warnings.warn(f"Failed to parse {pyproject_path}: {e}", RuntimeWarning, stacklevel=3)
         return _VERSION_UNKNOWN
 

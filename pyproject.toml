@@ -36,17 +36,11 @@ test = [
     "pytest-cov",
 ]
 dev = [
-    "black",
-    "black[jupyter]",
     "coverage[toml]",
-    "flake8",
-    "isort",
     "mypy",
     "nbmetaclean",
     "nox",
     "pre-commit",
-    "pytest",
-    "pytest-cov",
     "ruff",
 ]
 
@@ -86,7 +80,6 @@ exclude = [
   "dist",
   "node_modules",
   "site-packages",
-  "tests",
   "tools",
   "venv",
 ]

@@ -36,7 +36,7 @@ def test_version_from_metadata(monkeypatch):
 
 **Step 2: Run test to verify it fails**
 
-Run: `pytest tests/test_version.py::test_version_from_metadata -v`  
+Run: `pytest tests/test_version.py::test_version_from_metadata -v`
 Expected: FAIL because `__version__` is still hardcoded.
 
 **Step 3: Write minimal implementation**
@@ -100,7 +100,7 @@ __version__ = get_version()  # pragma: no cover
 
 **Step 4: Run test to verify it passes**
 
-Run: `pytest tests/test_version.py::test_version_from_metadata -v`  
+Run: `pytest tests/test_version.py::test_version_from_metadata -v`
 Expected: PASS.
 
 **Step 5: Commit**
@@ -133,7 +133,7 @@ def test_version_from_pyproject(monkeypatch):
 
 **Step 2: Run test to verify it fails**
 
-Run: `pytest tests/test_version.py::test_version_from_pyproject -v`  
+Run: `pytest tests/test_version.py::test_version_from_pyproject -v`
 Expected: FAIL until fallback is implemented.
 
 **Step 3: Write minimal implementation**
@@ -142,7 +142,7 @@ If not already included in Task 1, ensure `_read_version_from_pyproject()` is im
 
 **Step 4: Run test to verify it passes**
 
-Run: `pytest tests/test_version.py::test_version_from_pyproject -v`  
+Run: `pytest tests/test_version.py::test_version_from_pyproject -v`
 Expected: PASS.
 
 **Step 5: Commit**
@@ -161,7 +161,7 @@ git commit -m "test: cover pyproject version fallback"
 
 **Step 1: Run tests**
 
-Run: `pytest -v`  
+Run: `pytest -v`
 Expected: PASS.
 
 **Step 2: Commit (if any changes)**
