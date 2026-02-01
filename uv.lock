@@ -39,6 +39,7 @@ version = "0.2.5b1"
 source = { editable = "." }
 dependencies = [
     { name = "rich" },
+    { name = "tomli", marker = "python_full_version < '3.11'" },
 ]
 
 [package.optional-dependencies]
@@ -77,6 +78,7 @@ requires-dist = [
     { name = "pytest-cov", marker = "extra == 'test'" },
     { name = "rich" },
     { name = "ruff", marker = "extra == 'dev'" },
+    { name = "tomli", marker = "python_full_version < '3.11'", specifier = ">=2.0.0" },
 ]
 provides-extras = ["test", "dev"]
 
