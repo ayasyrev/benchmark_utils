@@ -1,7 +1,0 @@
-pre-commit
-nbmetaclean
-black
-black[jupyter]
-flake8
-mypy
-isort

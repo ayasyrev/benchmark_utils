@@ -1,5 +1,5 @@
-"""Wrapper over timeit to easy benchmark.
-"""
+"""Wrapper over timeit to easy benchmark."""
+
 from __future__ import annotations
 
 from collections import defaultdict
@@ -31,25 +31,18 @@ def benchmark(
     text_color = "[blue]"
     task = progress_bar.add_task(f"{text_color}{name}", total=num_repeats)
     for i in range(num_repeats):
-        progress_bar.tasks[
-            task
-        ].description = f"{text_color}{name}: run {i + 1}/{num_repeats}"
+        progress_bar.tasks[task].description = f"{text_color}{name}: run {i + 1}/{num_repeats}"
         run_times.append(timeit(func, number=1))  # type: ignore
         progress_bar.update(task, advance=1)
     run_time_avg = sum(run_times) / len(run_times)
-    progress_bar.tasks[
-        task
-    ].description = f"{text_color}{name}: {run_time_avg:0.2f} sec/run."
+    progress_bar.tasks[task].description = f"{text_color}{name}: {run_time_avg:0.2f} sec/run."
     return run_times
 
 
 def get_func_name(func: AnyFunc) -> str:
-    """Return name of Callable - function ot partial"""
+    """Return name of Callable - function or partial"""
     if isinstance(func, partial):
-        args = ", ".join(
-            [str(arg) for arg in func.args]
-            + [f"{k}={v}" for k, v in func.keywords.items()]
-        )
+        args = ", ".join([str(arg) for arg in func.args] + [f"{k}={v}" for k, v in func.keywords.items()])
         return f"{func.func.__name__}({args})"
     return func.__name__
 
@@ -140,12 +133,8 @@ class Benchmark:
                 for num, func_name in enumerate(func_names):
                     self.progress_bar.tasks[  # pylint: disable=invalid-sequence-index
                         main_task
-                    ].description = (
-                        f"{text_color}running {func_name} {num + 1}/{num_funcs}"
-                    )
-                    self._results[func_name] = self._run_benchmark(
-                        func_name, num_repeats=num_repeats
-                    )
+                    ].description = f"{text_color}running {func_name} {num + 1}/{num_funcs}"
+                    self._results[func_name] = self._run_benchmark(func_name, num_repeats=num_repeats)
                     self.progress_bar.update(main_task, advance=1)
                 self.progress_bar.tasks[  # pylint: disable=invalid-sequence-index
                     main_task
@@ -178,10 +167,7 @@ class Benchmark:
     def results(self) -> Dict[str, float]:
         """Return dict w/ results"""
         if self._results:
-            return {
-                name: sum(res_list) / len(res_list)
-                for name, res_list in self._results.items()
-            }
+            return {name: sum(res_list) / len(res_list) for name, res_list in self._results.items()}
         return {}
 
     def print_results(
@@ -235,13 +221,13 @@ class Benchmark:
         return f"{self.__class__.__name__}({self.func_names})"
 
 
-def try_run(func: AnyFunc, item: Any) -> str | None:
+def try_run(func: AnyFunc, item: Any) -> dict[str, Any] | None:
     """Run func, return None or exception message"""
     try:
         func(item)
         return None
-    except Exception as excpt:  # pylint: disable=broad-except
-        return {"exception": excpt, "item": item}
+    except Exception as e:  # pylint: disable=broad-except
+        return {"exception": e, "item": item}
 
 
 class BenchmarkIter(Benchmark):
@@ -274,15 +260,13 @@ class BenchmarkIter(Benchmark):
         self.exceptions = defaultdict(list)
         super()._reset_results()
 
-    def run_func_iter(self, func_name: str) -> AnyFunc:
+    def run_func_iter(self, func_name: str) -> Callable[[], None]:
         """Return func, that run func over item_list"""
         func = self.func_dict[func_name]
 
         def inner():
             num_samples = self._num_samples or len(self.item_list)
-            task = self.progress_bar.add_task(
-                f"iterating {func_name}", total=num_samples
-            )
+            task = self.progress_bar.add_task(f"iterating {func_name}", total=num_samples)
 
             if self._multiprocessing:
                 if self._num_workers is not None:
@@ -303,9 +287,9 @@ class BenchmarkIter(Benchmark):
                     if result:
                         self.exceptions[func_name].append(result)
                     self.progress_bar.update(task, advance=1)
-            self.progress_bar.tasks[
-                task
-            ].visible = False  # pylint: disable=invalid-sequence-index
+            self.progress_bar.tasks[task].visible = (  # pylint: disable=invalid-sequence-index
+                False
+            )
 
         return inner
 
@@ -317,14 +301,9 @@ class BenchmarkIter(Benchmark):
     ) -> None:
         """Print results per item, you can compare and sort them"""
         if self.exceptions:
-            rprint(
-                f"Got {len(self.exceptions)} exceptions: {', '.join(self.exceptions.keys())}."
-            )
+            rprint(f"Got {len(self.exceptions)} exceptions: {', '.join(self.exceptions.keys())}.")
         num_items = self._num_samples or len(self.item_list)
-        results = {
-            func_name: (1 / result * num_items)
-            for func_name, result in self.results.items()
-        }
+        results = {func_name: (1 / result * num_items) for func_name, result in self.results.items()}
         results_header = " Func name  | Items/sec"
         self._print_results(
             results=results,

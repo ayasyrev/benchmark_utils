@@ -2,20 +2,33 @@ name: Tests
 on:
   push:
     branches:
-      - dev 
+      - dev
       - main
 jobs:
   tests:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python: ["3.8", "3.9", "3.10", "3.11",]
-    name: Python ${{ matrix.python }}
+        python: ["3.10", "3.11", "3.12", "3.13", "3.14"]
     steps:
-    - uses: actions/checkout@v4
-    - uses: actions/setup-python@v2
+    - name: Checkout
+      uses: actions/checkout@main
+    - name: Setup Python ${{ matrix.python }}
+      uses: actions/setup-python@main
       with:
         python-version: ${{ matrix.python }}
         architecture: x64
-    - run: pip install nox
-    - run: nox -p ${{ matrix.python }}
+
+    - name: Install
+      run: |
+        pip install uv
+        uv pip install --system .[test] "coverage[toml]"
+    - name: Tests
+      run: pytest --cov
+
+    - name: Coverage
+      if: ${{ matrix.python == '3.13' }}
+      uses: codecov/codecov-action@main
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+        slug: ayasyrev/benchmark_utils

@@ -1,11 +1,10 @@
 import nox
 
+locations = "."
 
-locations = "src/benchmark_utils", "tests", "noxfile.py"
 
-
-@nox.session(python=["3.8", "3.9", "3.10", "3.11", "3.12"])
-def lint(session):
+@nox.session(python=["3.10", "3.11", "3.12", "3.13", "3.14"], venv_backend="uv")
+def lint_ruff(session):
     args = session.posargs or locations
-    session.install("flake8")
-    session.run("flake8", *args)
+    session.install("ruff")
+    session.run("ruff", "check", *args)

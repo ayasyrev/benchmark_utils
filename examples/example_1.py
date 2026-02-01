@@ -1,4 +1,5 @@
 """Simple benchmark example."""
+
 from time import sleep
 
 from benchmark_utils import Benchmark
